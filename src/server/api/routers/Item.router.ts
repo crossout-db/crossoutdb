@@ -45,13 +45,13 @@ export const itemRouter = createTRPCRouter({
       });
     }),
   
-  create: protectedProcedure
-    .input(itemSchema)
-    .mutation(({ ctx, input }) => {
-      return ctx.db.item.create({
-        data: itemCreateSchema.parse(input),
-      });
-    }),
+  // create: protectedProcedure
+  //   .input(itemSchema)
+  //   .mutation(({ ctx, input }) => {
+  //     return ctx.db.item.create({
+  //       data: itemCreateSchema.parse(input),
+  //     });
+  //   }),
 
   update: protectedProcedure
     .input(itemUpdateSchema)
