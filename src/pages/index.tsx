@@ -1,61 +1,33 @@
-import { signIn, signOut, useSession } from "next-auth/react";
-import Head from "next/head";
+import WithNavBar from "../components/WithNavBar";
+import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
+import { getEnhancedPrisma } from "../server/enhanced-db";
+import { useCurrentUser } from "../lib/context";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { MarketTable } from "~/components/marketTable";
 
-import { api } from "~/utils/api";
-
-import { Header } from "~/components/header";
-import { Market } from "~/components/market";
-
-export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from Crossout DB" });
+const Home: NextPage = () => {
+  const currentUser = useCurrentUser();
+  const router = useRouter();
+  const { status } = useSession();
 
   return (
-    <>
-      <Head>
-        <title>Crossout DB</title>
-        <meta
-          name="description"
-          content="Crossout Market Prices, Graphs and Crafting Calculator"
-        />
-        <meta
-          name="keywords"
-          content="CrossoutDB,Crossout,Crossout Market,Crafting,Calculator,Market,Graphs,Diagramm"
-        />
-        <meta name="author" content="SilentNyte & Stiffi" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className=" flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <Header />
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-            </p>
-            <AuthShowcase />
+    <WithNavBar>
+      <div className="mt-8 flex w-full flex-col items-center text-center">
+        {currentUser && (
+          <h1 className="text-2xl text-gray-800">Welcome {currentUser.name}!</h1>
+        )}
+
+        <div className="w-full p-8">
+          <div>{/* <CalcCraftingCosts /> */}</div>
+          <div className="block overflow-auto">
+            <MarketTable />
           </div>
         </div>
-        <Market />
-      </main>
-    </>
+      </div>
+    </WithNavBar>
   );
-}
+};
 
-function AuthShowcase() {
-  const { data: sessionData } = useSession();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined },
-  );
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-white">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-        {secretMessage && <span> - {secretMessage}</span>}
-      </p>
-    </div>
-  );
-}
+export default Home;

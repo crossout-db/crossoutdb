@@ -1,0 +1,15 @@
+import { z } from 'zod';
+import { SortOrderSchema } from '../enums/SortOrder.schema';
+
+import type { Prisma } from '@prisma/client';
+
+const Schema: z.ZodType<Prisma.PackAvgOrderByAggregateInput> = z
+  .object({
+    id: z.lazy(() => SortOrderSchema).optional(),
+    steamAppID: z.lazy(() => SortOrderSchema).optional(),
+    coins: z.lazy(() => SortOrderSchema).optional(),
+    releaseId: z.lazy(() => SortOrderSchema).optional(),
+  })
+  .strict();
+
+export const PackAvgOrderByAggregateInputObjectSchema = Schema;

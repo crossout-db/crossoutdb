@@ -1,0 +1,52 @@
+import { z } from 'zod';
+import { IntFieldUpdateOperationsInputObjectSchema } from './IntFieldUpdateOperationsInput.schema';
+import { NullableFloatFieldUpdateOperationsInputObjectSchema } from './NullableFloatFieldUpdateOperationsInput.schema';
+import { NullableDateTimeFieldUpdateOperationsInputObjectSchema } from './NullableDateTimeFieldUpdateOperationsInput.schema';
+import { BoolFieldUpdateOperationsInputObjectSchema } from './BoolFieldUpdateOperationsInput.schema';
+
+import type { Prisma } from '@prisma/client';
+
+const Schema: z.ZodType<Prisma.RecipeUncheckedUpdateManyWithoutRecipesInput> = z
+  .object({
+    id: z
+      .union([
+        z.number(),
+        z.lazy(() => IntFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional(),
+    resultItemId: z
+      .union([
+        z.number(),
+        z.lazy(() => IntFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional(),
+    quantity: z
+      .union([
+        z.number(),
+        z.lazy(() => IntFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional(),
+    craftCost: z
+      .union([
+        z.number(),
+        z.lazy(() => NullableFloatFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional()
+      .nullable(),
+    timestamp: z
+      .union([
+        z.coerce.date(),
+        z.lazy(() => NullableDateTimeFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional()
+      .nullable(),
+    active: z
+      .union([
+        z.boolean(),
+        z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema),
+      ])
+      .optional(),
+  })
+  .strict();
+
+export const RecipeUncheckedUpdateManyWithoutRecipesInputObjectSchema = Schema;

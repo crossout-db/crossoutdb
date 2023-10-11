@@ -1,0 +1,19 @@
+import { z } from 'zod';
+
+import type { Prisma } from '@prisma/client';
+
+const Schema: z.ZodType<Prisma.MarketCreateManyInput> = z
+  .object({
+    id: z.number().optional(),
+    itemId: z.number(),
+    marketDef: z.string(),
+    sellPriceMin: z.number(),
+    sellOrders: z.number(),
+    buyPriceMax: z.number(),
+    buyOrders: z.number(),
+    craftCost: z.number().optional().nullable(),
+    timestamp: z.coerce.date().optional(),
+  })
+  .strict();
+
+export const MarketCreateManyInputObjectSchema = Schema;
