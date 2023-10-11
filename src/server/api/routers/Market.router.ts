@@ -9,11 +9,11 @@ import { MarketUpdateManySchema } from "../schemas/Market/updateManyMarket.schem
 import { MarketUpdateOneSchema } from "../schemas/Market/updateOneMarket.schema";
 
 export const marketsRouter = createTRPCRouter({
-  createOne: publicProcedure
-    .input(MarketCreateOneSchema).mutation(async ({ ctx, input }) => {
-      const createOneMarket = await ctx.db.market.create(input);
-      return createOneMarket;
-    }),
+  // createOne: publicProcedure
+  //   .input(MarketCreateOneSchema).mutation(async ({ ctx, input }) => {
+  //     const createOneMarket = await ctx.db.market.create(input);
+  //     return createOneMarket;
+  //   }),
   deleteOne: publicProcedure
     .input(MarketDeleteOneSchema).mutation(async ({ ctx, input }) => {
       const deleteOneMarket = await ctx.db.market.delete(input);
@@ -44,10 +44,10 @@ export const marketsRouter = createTRPCRouter({
       const updateManyMarket = await ctx.db.market.updateMany(input);
       return updateManyMarket;
     }),
-  updateOne: publicProcedure
-    .input(MarketUpdateOneSchema).mutation(async ({ ctx, input }) => {
-      const updateOneMarket = await ctx.db.market.update(input);
-      return updateOneMarket;
-    }),
+  // updateOne: publicProcedure
+  //   .input(MarketUpdateOneSchema).mutation(async ({ ctx, input }) => {
+  //     const updateOneMarket = await ctx.db.market.update(input);
+  //     return updateOneMarket;
+  //   }),
 
 }) 
