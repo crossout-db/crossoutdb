@@ -1,6 +1,9 @@
 import { api, type RouterOutputs } from "~/utils/api";
 
-type RecipeFindManyWithResultOutput =
+type ItemFindManyWithMarketOutput =
+  RouterOutputs["item"]["findManyWithMarket"][number];
+
+  type RecipeFindManyWithResultOutput =
   RouterOutputs["recipe"]["findManyWithResult"][number];
 
 interface ItemCrafting {
@@ -48,7 +51,7 @@ export const CalcCraftingCosts = () => {
         }
         //console.warn(`Item ${recipe.resultItemId} found`);
       } else {
-        const item = items?.find((item) => item.id === recipe.resultItemId);
+        const item = items?.find((item: ItemFindManyWithMarketOutput) => item.id === recipe.resultItemId);
         itemCraftCosts.push({
           itemId: recipe.resultItemId,
           itemName: recipe.result.name,
