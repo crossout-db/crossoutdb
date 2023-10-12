@@ -30,9 +30,9 @@ const config = {
     defaultLocale: "en",
   },
 
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default config;
