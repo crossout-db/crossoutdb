@@ -1,5 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import $Schema from '@zenstackhq/runtime/zod/input';
+import $Schema from 'zenstack/zod/input';
 
 export const recipesRouter = createTRPCRouter({
   findManyWithResult: publicProcedure
