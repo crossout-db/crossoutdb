@@ -9,7 +9,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "vercel-build": "zenstack generate && tsc && prisma db push && tsx prisma/seed.ts"
+    "vercel-build": "zenstack generate && tsc && prisma db push"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
