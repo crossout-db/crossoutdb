@@ -1,9 +1,9 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import $Schema from 'zenstack/zod/input';
+import { RecipeItemInputSchema } from 'zenstack/zod/input/RecipeItemInput.schema';
 
 export const recipesRouter = createTRPCRouter({
   findManyWithResult: publicProcedure
-    .input($Schema.RecipeItemInputSchema.findMany)
+    .input(RecipeItemInputSchema.findMany)
     .query(async ({ ctx }) => {
       const findManyWithResultRecipe = await ctx.db.recipe.findMany({
         include: {
