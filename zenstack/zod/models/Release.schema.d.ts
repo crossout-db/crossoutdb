@@ -1,0 +1,103 @@
+import { z } from 'zod';
+export declare const ReleaseSchema: z.ZodObject<{
+    id: z.ZodNumber;
+    name: z.ZodString;
+    xoVersion: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    build: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    battlePass: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    startDate: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    endDate: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    active: z.ZodBoolean;
+}, "strip", z.ZodTypeAny, {
+    id: number;
+    name: string;
+    active: boolean;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+}, {
+    id: number;
+    name: string;
+    active: boolean;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+}>;
+export declare const ReleaseCreateSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodNumber>;
+    name: z.ZodString;
+    xoVersion: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    build: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    battlePass: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    startDate: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    endDate: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    active: z.ZodBoolean;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    active: boolean;
+    id?: number | undefined;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+}, {
+    name: string;
+    active: boolean;
+    id?: number | undefined;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+}>;
+export declare const ReleaseUpdateSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodNumber>;
+    name: z.ZodOptional<z.ZodString>;
+    xoVersion: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    build: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    battlePass: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    url: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    startDate: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodDate>>>;
+    endDate: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodDate>>>;
+    active: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    id?: number | undefined;
+    name?: string | undefined;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+    active?: boolean | undefined;
+}, {
+    id?: number | undefined;
+    name?: string | undefined;
+    xoVersion?: string | null | undefined;
+    build?: string | null | undefined;
+    description?: string | null | undefined;
+    battlePass?: string | null | undefined;
+    url?: string | null | undefined;
+    startDate?: Date | null | undefined;
+    endDate?: Date | null | undefined;
+    active?: boolean | undefined;
+}>;

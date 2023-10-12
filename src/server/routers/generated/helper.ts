@@ -4,7 +4,7 @@ import { isPrismaClientKnownRequestError } from '@zenstackhq/runtime';
 export async function checkMutate<T>(promise: Promise<T>): Promise<T | undefined> {
     try {
         return await promise;
-    } catch (err: unknown) {
+    } catch (err: any) {
         if (isPrismaClientKnownRequestError(err)) {
             if (err.code === 'P2004') {
                 if (err.meta?.reason === 'RESULT_NOT_READABLE') {
@@ -35,7 +35,7 @@ export async function checkMutate<T>(promise: Promise<T>): Promise<T | undefined
 export async function checkRead<T>(promise: Promise<T>): Promise<T> {
     try {
         return await promise;
-    } catch (err: unknown) {
+    } catch (err: any) {
         if (isPrismaClientKnownRequestError(err)) {
             if (err.code === 'P2004') {
                 // rejected by policy
