@@ -2,11 +2,11 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "~/server/api/trpc";
-import { ItemInputSchema } from 'zenstack/zod/input/ItemInput.schema';
+import $Schema from '@zenstackhq/runtime/zod/input';
 
 export const itemsRouter = createTRPCRouter({
   findManyWithMarket: publicProcedure
-    .input(ItemInputSchema.findMany)
+    .input($Schema.ItemInputSchema.findMany)
     .query(async ({ ctx }) => {
       const findManyWithMarketItem = await ctx.db.item.findMany({
         include: {
@@ -25,7 +25,7 @@ export const itemsRouter = createTRPCRouter({
       return findManyWithMarketItem;
     }),
   findUnique: publicProcedure
-    .input(ItemInputSchema.findUnique)
+    .input($Schema.ItemInputSchema.findUnique)
     .query(async ({ ctx, input }) => {
       const findUniqueItem = await ctx.db.item.findUnique({
         where: { id: input.where.id },
