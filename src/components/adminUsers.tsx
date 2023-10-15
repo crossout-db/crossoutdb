@@ -1,5 +1,5 @@
 import { useCurrentUser } from "../lib/context";
-import { useFindManyUser } from "../lib/hooks";
+import { useFindManyUser } from "zenstack/generated/swr/hooks";
 import Avatar from "../components/Avatar";
 import ManageUsers from "../components/ManageUsers";
 import { useEffect, useState } from "react";

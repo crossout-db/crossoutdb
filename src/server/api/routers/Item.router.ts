@@ -5,6 +5,11 @@ import {
 import $Schema from '@zenstackhq/runtime/zod/input';
 
 export const itemsRouter = createTRPCRouter({
+  findMany: publicProcedure
+    .query(async ({ ctx }) => {
+      const findManyItem = await ctx.db.item.findMany();
+      return findManyItem;
+    }),
   findManyWithMarket: publicProcedure
     .input($Schema.ItemInputSchema.findMany)
     .query(async ({ ctx }) => {

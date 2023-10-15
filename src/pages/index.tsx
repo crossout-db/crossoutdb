@@ -6,11 +6,14 @@ import { useCurrentUser } from "../lib/context";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { MarketTable } from "~/components/marketTable";
+import { useFindManyPack } from "zenstack/generated/swr/hooks";
 
 const Home: NextPage = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
   const { status } = useSession();
+  const { data: packs } = useFindManyPack({select: {steamAppID: true}});
+  const appIds = packs?.map((pack) => pack.steamAppID).join(",");
 
   return (
     <WithNavBar>
@@ -21,6 +24,7 @@ const Home: NextPage = () => {
 
         <div className="w-full p-8">
           <div>{/* <CalcCraftingCosts /> */}</div>
+          <div>{JSON.stringify(appIds)}</div>
           <div className="block overflow-auto">
             <MarketTable />
           </div>

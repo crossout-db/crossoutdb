@@ -1,6 +1,5 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import type { Item } from "@prisma/client";
-import { api } from "~/utils/api";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -31,7 +30,7 @@ import {
   useFindManyRarity,
   useFindManyType,
   useMutateItem,
-} from "~/lib/hooks";
+} from "zenstack/generated/swr/hooks";
 
 const AdminItems = () => {
   const { data: initialTableData } = useFindManyItem({

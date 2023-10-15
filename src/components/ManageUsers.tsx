@@ -5,7 +5,7 @@ import {
   useFindManyUser,
   useFindUniqueUser,
   useMutateUser,
-} from "../lib/hooks";
+} from "zenstack/generated/swr/hooks";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 import Avatar from "./Avatar";
 

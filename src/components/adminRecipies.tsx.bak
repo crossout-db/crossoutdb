@@ -27,7 +27,7 @@ import { Delete, Edit } from "@mui/icons-material";
 import {
   useFindManyRecipe,
   useMutateRecipe,
-} from "~/lib/hooks";
+} from "zenstack/generated/swr/hooks";
 
 const AdminRecipies = () => {
   const { data: initialTableData } = useFindManyRecipe({

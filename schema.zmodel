@@ -15,12 +15,13 @@ datasource db {
 
 plugin hooks {
     provider = '@zenstackhq/swr'
-    output = "./src/lib/hooks"
+    output = "zenstack/generated/swr/hooks"
 }
 
 plugin trpc {
     provider = '@zenstackhq/trpc'
-    output = 'src/server/routers/generated'
+    output = 'zenstack/generated/trpc'
+    generateClientHelpers = 'next'
 }
 
 model Example {
