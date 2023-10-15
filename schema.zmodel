@@ -356,7 +356,7 @@ model BadgeExchange {
     @@allow('delete', auth().role == "ADMIN")
 }
 
-model log {
+model Log {
     id Int @id @default(autoincrement())
     timestamp DateTime @default(now())
     user User @relation(fields: [userId], references: [id])
@@ -418,7 +418,7 @@ model User {
     accounts Account[]
     sessions Session[]
     itemStats ItemStats[]
-    log log[]
+    log Log[]
 
     // everyone can create a profile
     @@allow('create', true)

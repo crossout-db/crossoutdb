@@ -280,7 +280,7 @@ model BadgeExchange {
 /// @@allow('read', true)
 /// @@allow('create,update', auth().role == 'ADMIN' || auth().role == 'CONTRIBUTOR')
 /// @@allow('delete', auth().role == 'ADMIN')
-model log {
+model Log {
     id Int @id() @default(autoincrement())
     timestamp DateTime @default(now())
     user User @relation(fields: [userId], references: [id])
@@ -329,7 +329,7 @@ model User {
     accounts Account[]
     sessions Session[]
     itemStats ItemStats[]
-    log log[]
+    log Log[]
 }
 
 model VerificationToken {
