@@ -1,0 +1,14 @@
+{
+    "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
+    "crons": [
+        {
+        "path": "/api/UpdatePackPrices",
+        "schedule": "0 0 * * *"
+        },
+        {
+        "path": "/api/UpdateMarketPrices",
+        "schedule": "*/5 * * * *"
+        }
+    ]
+
+}
