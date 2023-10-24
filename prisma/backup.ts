@@ -7,6 +7,7 @@ const prisma = new PrismaClient()
 async function main() {
 
     const seedData: SeedData = {
+        user: [],
         release: await prisma.release.findMany({}),
         recipe: await prisma.recipe.findMany({}),
         recipeItem: await prisma.recipeItem.findMany({}),
