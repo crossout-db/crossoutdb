@@ -4,6 +4,8 @@ import Item from './Item';
 import Price from './Price';
 import { type RouterOutputs } from '~/utils/api';
 import { useMemo } from 'react';
+import { useTranslation } from "next-i18next";
+import { notFound } from 'next/navigation';
 
 type ItemFindManyWithMarketOutput =
     RouterOutputs["item"]["findManyWithMarket"][number];
@@ -19,12 +21,13 @@ export default function MarketTable({
     rarities: RarityData;
     lang: string;
 }) {
+    const { t } = useTranslation(['common','model']);
     const columnHelper = createColumnHelper<ItemFindManyWithMarketOutput>();
 
     const columns = useMemo(() => [
         columnHelper.accessor(row => row.id, {
             id: 'item',
-            header: 'Item',
+            header: t("model:item"),
             cell: props => {
                 return (
                     <Item
@@ -40,7 +43,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.name, {
             id: 'availableName',
-            header: 'Name',
+            header: t("model:name"),
             enableHiding: true,
             enableGlobalFilter: true,
         }),
@@ -48,14 +51,14 @@ export default function MarketTable({
             row => { return row.type; },
             {
                 id: 'itemTypeName',
-                header: 'Type',
+                header: t("model:type"),
                 enableHiding: true,
                 enableGlobalFilter: true,
             },
         ),
         columnHelper.accessor(row => row.rarityId, {
             id: 'rarityId',
-            header: 'rarityId',
+            header: t("model:rarity"),
             enableHiding: true,
             enableGlobalFilter: false,
             filterFn: (row, columnId: string, filterValue: number[]) => {
@@ -67,7 +70,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.categoryId, {
             id: 'categoryId',
-            header: 'categoryId',
+            header: t("model:category"),
             enableHiding: true,
             enableGlobalFilter: false,
             filterFn: (row, columnId: string, filterValue: number[]) => {
@@ -80,7 +83,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.market[0]?.sellPriceMin, {
             id: 'sellPrice',
-            header: 'Sold for (min.)',
+            header: t("model:marketModel.sellPriceMin"),
             cell: props => {
                 const val = props.getValue();
                 return val !== undefined ? <Price className="justify-end" value={val} /> : 'N/A';
@@ -89,7 +92,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.market[0]?.sellOrders, {
             id: 'sellOffers',
-            header: 'Offers',
+            header: t("model:marketModel.sellOrders"),
             cell: props => {
                 const val = props.getValue();
                 return val ?? 'N/A';
@@ -98,7 +101,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.market[0]?.buyPriceMax, {
             id: 'buyPrice',
-            header: 'Bought for (max.)',
+            header: t("model:marketModel.buyPriceMax"),
             cell: props => {
                 const val = props.getValue();
                 return val !== undefined ? <Price className="justify-end" value={val} /> : 'N/A';
@@ -107,7 +110,7 @@ export default function MarketTable({
         }),
         columnHelper.accessor(row => row.market[0]?.buyOrders, {
             id: 'buyOrders',
-            header: 'Orders',
+            header: t("model:marketModel.buyOrders"),
             cell: props => {
                 const val = props.getValue();
                 return val ?? 'N/A';
@@ -122,7 +125,7 @@ export default function MarketTable({
             },
             {
                 id: 'profit',
-                header: 'Profit',
+                header: t("model:marketModel.profit"),
                 cell: props => {
                     const val = props.getValue();
                     return val !== undefined ? <Price className="justify-end" value={val} /> : 'N/A';
@@ -138,7 +141,7 @@ export default function MarketTable({
             },
             {
                 id: 'roi',
-                header: 'ROI',
+                header: t("model:marketModel.roi"),
                 cell: props => {
                     const val = props.getValue();
                     return val !== undefined ? val.toFixed(2) + '%' : 'N/A';
@@ -148,7 +151,7 @@ export default function MarketTable({
         ),
     ], []);
 
-    if (!data) return <p>Not found</p>;
+    if (!data) return <p>{t("notFound")}</p>;
 
     return (
     <DataTable

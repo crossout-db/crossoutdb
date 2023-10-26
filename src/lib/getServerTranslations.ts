@@ -8,8 +8,8 @@ type ArrayElementOrSelf<T> = T extends Array<infer U> ? U[] : T[];
 
 export const getServerTranslations = async (
   locale: string,
-  namespacesRequired?: ArrayElementOrSelf<Namespace> | undefined,
-  configOverride?: UserConfig,
+  namespacesRequired?: ArrayElementOrSelf<Namespace> | string | string[] | undefined,
+  configOverride?: UserConfig | null,
   extraLocales?: string[] | false
 ): Promise<SSRConfig> => {
   const config = configOverride ?? nextI18nextConfig

@@ -1,20 +1,27 @@
 import WithNavBar from "../components/WithNavBar";
-import type { NextPage } from "next";
 import { useCurrentUser } from "../lib/context";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { GetServerSideProps, type NextPage } from "next";
+import { getServerTranslations } from "~/lib/getServerTranslations";
+import { useTranslation } from "next-i18next";
 import MarketTable from "~/components/crossoutstyle/MarketTable";
 import { api } from "~/utils/api";
 import { uniqBy } from "lodash";
+
+type Props = {
+  // Add custom props here
+}
 
 const Market: NextPage = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
   const { status } = useSession();
   const { data, isLoading } = api.item.findManyWithMarket.useQuery({});
+  const { t } = useTranslation();
 
   if (!data) {
-    return <div className="block overflow-auto">loading...</div>;
+    return <div className="block overflow-auto">{t("loading")}</div>;
   }
 
   const categories = {
@@ -51,5 +58,15 @@ const Market: NextPage = () => {
     />
   );
 };
+
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  locale,
+}) => ({
+  props: {
+    ...(await getServerTranslations(locale ?? 'en', [
+      'common','model'
+    ])),
+  },
+})
 
 export default Market;

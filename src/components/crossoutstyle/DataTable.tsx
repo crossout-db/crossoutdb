@@ -30,6 +30,7 @@ import React, { useState } from 'react';
 import { uniq } from 'lodash';
 import IconButton from './IconButton';
 import RarityButton from './RarityButton';
+import { useTranslation } from "next-i18next";
 
 export interface CategoryData {
     categories: Category[];
@@ -64,6 +65,7 @@ const CategoryFilter = ({
 }) => {
     const [categories, setCategories] = useState<number[]>([0]);
 
+    const { t } = useTranslation(['model']);
     if (!data) return <></>;
 
     const size = 42;
@@ -117,7 +119,7 @@ const CategoryFilter = ({
     ];
     return (
         <div className="inline-flex flex-col space-y-0.5">
-            <span className="text-white">Category</span>
+            <span className="text-white">{t("model:category")}</span>
             <div className="inline">
                 <div className="inline space-x-1">{buttons}</div>
             </div>
@@ -134,6 +136,7 @@ const RarityFilter = ({
 }) => {
     const [rarities, setRarities] = useState<number[]>([]);
 
+    const { t } = useTranslation(['model']);
     if (!data) return <></>;
 
     const handleClick = (rarity: number) => {
@@ -170,7 +173,7 @@ const RarityFilter = ({
 
     return (
         <div className="inline-flex flex-col space-y-0.5">
-            <span className="text-white">Rarity</span>
+            <span className="text-white">{t("model:rarity")}</span>
             <div className="inline">
                 <div className="inline space-x-1">{buttons}</div>
             </div>
@@ -239,6 +242,7 @@ const DataTable = ({
         getCanPreviousPage,
     } = table;
     const currentPageIndex = pagination.pageIndex;
+    const { t } = useTranslation();
 
     let pageButtons = [];
     const prevBtnMin = Math.max(
@@ -267,7 +271,7 @@ const DataTable = ({
         <>
             <div className="space-x-3">
                 <div className="inline-flex flex-col space-y-0.5">
-                    <span className="text-white">Search</span>
+                    <span className="text-white">{t("search")}</span>
                     <div className="inline">
                         <DebouncedInput
                             value={globalFilter}

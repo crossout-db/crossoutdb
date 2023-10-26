@@ -2,12 +2,16 @@ import WithNavBar from "../components/WithNavBar";
 import { useCurrentUser } from "../lib/context";
 import Error from "next/error";
 import { Tab } from "@headlessui/react";
-import { useTranslation } from "next-i18next";
-import { GetServerSideProps, type NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import AdminUsers from "~/components/AdminUsers";
 import AdminItems from "~/components/AdminItems";
+import { GetServerSideProps, type NextPage } from "next";
 import { getServerTranslations } from "~/lib/getServerTranslations";
+import { useTranslation } from "next-i18next";
+
+
+type Props = {
+  // Add custom props here
+}
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -15,7 +19,7 @@ function classNames(...classes: string[]) {
 
 export default function Admin() {
   const currentUser = useCurrentUser();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   if (currentUser?.role !== "ADMIN") {
     return <Error statusCode={404} />;
@@ -38,7 +42,7 @@ export default function Admin() {
                   )
                 }
               >
-                {t("common:admin.users")}
+                {t("admin.users")}
               </Tab>
               <Tab
                 className={({ selected }) =>
@@ -51,7 +55,7 @@ export default function Admin() {
                   )
                 }
               >
-                {t("common:admin.items")}
+                {t("admin.items")}
               </Tab>
               <Tab
                 className={({ selected }) =>
@@ -64,7 +68,7 @@ export default function Admin() {
                   )
                 }
               >
-                {t("common:admin.recipes")}
+                {t("admin.recipes")}
               </Tab>
             </Tab.List>
             <Tab.Panels className="mt-2">
@@ -74,7 +78,7 @@ export default function Admin() {
               <Tab.Panel>
                 <AdminItems />
               </Tab.Panel>
-              <Tab.Panel>{t("common:admin.recipes")}</Tab.Panel>
+              <Tab.Panel>{t("admin.recipes")}</Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
         </div>
@@ -83,10 +87,12 @@ export default function Admin() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      ...(await getServerTranslations(locale!, ["common"])),
-    },
-  };
-};
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  locale,
+}) => ({
+  props: {
+    ...(await getServerTranslations(locale ?? 'en', [
+      'common','model'
+    ])),
+  },
+})

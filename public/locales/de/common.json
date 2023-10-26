@@ -1,5 +1,9 @@
 {
     "welcome": "Willkommen",
+    "home": "Zuhause",
+    "loading": "Laden...",
+    "notFound": "Nicht gefunden",
+    "search": "Suche",
     "navbar": {
         "packs": "Packungen",
         "tools": {
