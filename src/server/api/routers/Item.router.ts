@@ -4,6 +4,25 @@ import {
 } from "~/server/api/trpc";
 import $Schema from '@zenstackhq/runtime/zod/input';
 
+const createRecipeTree = (depth: number): object | boolean => {
+  if (depth <= 0)
+    return true;
+
+  return {
+    include: {
+      recipes: {
+        include: {
+          ingredients: {
+            include: {
+              item: createRecipeTree(depth - 1),
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
 export const itemsRouter = createTRPCRouter({
   findMany: publicProcedure
     .query(async ({ ctx }) => {
@@ -57,7 +76,7 @@ export const itemsRouter = createTRPCRouter({
             include: {
               ingredients: {
                 include: {
-                  item: true,
+                  item: createRecipeTree(3),
                 },
               },
             },
@@ -74,7 +93,12 @@ export const itemsRouter = createTRPCRouter({
                 include: {
                   synergyItems: {
                     include: {
-                      item: true,
+                      item: {
+                        include: {
+                          rarity: true,
+                          category: true,
+                        }
+                      },
                     },
                   },
                 },

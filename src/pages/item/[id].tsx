@@ -6,7 +6,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { Tab } from "@headlessui/react";
 
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 import WithNavBar from "~/components/WithNavBar";
 import { ItemCard } from "~/components/itemCard";
@@ -14,92 +14,63 @@ import { ItemStatCard } from "~/components/itemStatsCard";
 import { ItemRecipeCard } from "~/components/itemRecipeCard";
 import { ItemMarketCard } from "~/components/itemMarketCard";
 import { ItemSynergyCard } from "~/components/itemSynergy";
+import Price from "~/components/crossoutstyle/Price";
+import { calculateProfit, calculateROI } from "~/lib/priceCalc";
+import PriceCard from "~/components/crossoutstyle/PriceCard";
+import Item from "~/components/crossoutstyle/Item";
+import rarityStyles from "~/lib/rarityStyles";
+import StatsCard from "~/components/crossoutstyle/StatsCard";
+import dayjs from "dayjs";
+import SynergyCard from "~/components/crossoutstyle/SynergyCard";
+import RecipeCard from "~/components/crossoutstyle/RecipeCard";
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+    return classes.filter(Boolean).join(" ");
 }
 
 export default function ItemPage() {
-  const router = useRouter();
-  const item_id = parseInt(router.query.id as string, 10);
-  const { data } = api.item.findUnique.useQuery({ where: { id: item_id } });
+    const router = useRouter();
+    const item_id = parseInt(router.query.id as string, 10);
+    const { data } = api.item.findUnique.useQuery({ where: { id: item_id } });
 
-  return (
-    <WithNavBar>
-      <div className="w-full p-8">
-        <div className="flex flex-col bg-blue-50 md:flex-row">
-          <div className="w-full md:w-2/3">
-            <div className="w-200 card bg-base-100 shadow-xl">
-              <div className="card-body">
-                {data != undefined && <ItemCard item={data} />}
+    if (!data)
+        return <></>
 
-                <div className="divider" />
-
-                {data != undefined && <ItemStatCard item={data} />}
-              </div>
+    return (
+        <div className="space-y-8">
+            <div className="flex flex-row items-center space-x-2">
+                <img src={"/images/items-highres/" + data.id + ".png"} width={128} height={128} />
+                <div className="block space-y-2">
+                    <h1 className="text-white text-3xl">{data.name}</h1>
+                    <div className="space-x-1">
+                        <span className={`rounded-lg px-2 py-0.5 font-bold ${rarityStyles(data.rarityId).backgroundColor} ${data.rarityId === 1 ? 'text-black' : 'text-white'}`}>{data.rarity.name}</span>
+                        <span className={"text-white rounded-lg px-2 py-0.5 font-bold bg-neutral-800"}>{data.category.name}</span>
+                        <span className={"text-white rounded-lg px-2 py-0.5 font-bold bg-neutral-800"}>{data.type.name}</span>
+                        <span className={"text-white rounded-lg px-2 py-0.5 font-bold bg-neutral-800"}>{data.faction.name}</span>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className="w-full md:w-1/3">
-            {data != undefined && <ItemMarketCard item={data} />}
-            {data != undefined && <ItemSynergyCard item={data} />}
-          </div>
+            {data.market[0] &&
+                <PriceCard
+                    sellPrice={data.market[0].sellPriceMin}
+                    buyPrice={data.market[0].buyPriceMax}
+                    sellOffers={data.market[0].sellOrders}
+                    buyOrders={data.market[0].buyOrders}
+                    marketFee={10}
+                    timestamp={data.market[0].timestamp}
+                />
+            }
+            <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-8">
+                {data.itemStats[0] &&
+                    <StatsCard data={data} />
+                }
+                {data.itemSynergies.length > 0 &&
+                    <SynergyCard data={data} />
+                }
+            </div>
+            <div className="flex flex-col text-white">
+                <RecipeCard data={data} />
+            </div>
         </div>
-
-        <div className="w-200 card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <Tab.Group>
-              <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700",
-                      "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2",
-                      selected
-                        ? "bg-white shadow"
-                        : "text-blue-100 hover:bg-white/[0.12] hover:text-white",
-                    )
-                  }
-                >
-                  Crafting
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700",
-                      "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2",
-                      selected
-                        ? "bg-white shadow"
-                        : "text-blue-100 hover:bg-white/[0.12] hover:text-white",
-                    )
-                  }
-                >
-                  Market
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700",
-                      "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2",
-                      selected
-                        ? "bg-white shadow"
-                        : "text-blue-100 hover:bg-white/[0.12] hover:text-white",
-                    )
-                  }
-                >
-                  History
-                </Tab>
-              </Tab.List>
-              <Tab.Panels className="mt-2">
-                <Tab.Panel>
-                  {data != undefined && <ItemRecipeCard item={data} />}
-                </Tab.Panel>
-                <Tab.Panel>Market</Tab.Panel>
-                <Tab.Panel>History</Tab.Panel>
-              </Tab.Panels>
-            </Tab.Group>
-          </div>
-        </div>
-      </div>
-    </WithNavBar>
-  );
+    );
 }
