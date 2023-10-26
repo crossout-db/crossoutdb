@@ -8,23 +8,48 @@ import { api } from "~/utils/api";
 import { uniqBy } from "lodash";
 
 const Market: NextPage = () => {
-    const currentUser = useCurrentUser();
-    const router = useRouter();
-    const { status } = useSession();
-    const { data, isLoading } = api.item.findManyWithMarket.useQuery({});
+  const currentUser = useCurrentUser();
+  const router = useRouter();
+  const { status } = useSession();
+  const { data, isLoading } = api.item.findManyWithMarket.useQuery({});
 
-    if (!data) {
-        return <div className="block overflow-auto">
-            loading...
-        </div>
-    }
+  if (!data) {
+    return <div className="block overflow-auto">loading...</div>;
+  }
 
-    const categories = { categories: uniqBy(data.map(item => { return { xodbId: item.category.id, order: item.category.id, LocNames: [{ name: item.category.name }] } }), category => category.xodbId).filter(category => category.xodbId !== 0) };
-    const rarities = { rarities: uniqBy(data.map(item => { return { xodbId: item.rarity.id, order: item.rarity.order, LocNames: [{ name: item.rarity.name }] } }), rarity => rarity.xodbId) };
+  const categories = {
+    categories: uniqBy(
+      data.map((item) => {
+        return {
+          xodbId: item.category.id,
+          order: item.category.id,
+          LocNames: [{ name: item.category.name }],
+        };
+      }),
+      (category) => category.xodbId,
+    ).filter((category) => category.xodbId !== 0),
+  };
+  const rarities = {
+    rarities: uniqBy(
+      data.map((item) => {
+        return {
+          xodbId: item.rarity.id,
+          order: item.rarity.order,
+          LocNames: [{ name: item.rarity.name }],
+        };
+      }),
+      (rarity) => rarity.xodbId,
+    ),
+  };
 
-    return (
-        <MarketTable data={data} categories={categories} rarities={rarities} lang="en" />
-    );
+  return (
+    <MarketTable
+      data={data}
+      categories={categories}
+      rarities={rarities}
+      lang="en"
+    />
+  );
 };
 
 export default Market;

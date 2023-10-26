@@ -8,12 +8,6 @@ import { Tab } from "@headlessui/react";
 
 import { RouterOutputs, api } from "~/utils/api";
 
-import WithNavBar from "~/components/WithNavBar";
-import { ItemCard } from "~/components/itemCard";
-import { ItemStatCard } from "~/components/itemStatsCard";
-import { ItemRecipeCard } from "~/components/itemRecipeCard";
-import { ItemMarketCard } from "~/components/itemMarketCard";
-import { ItemSynergyCard } from "~/components/itemSynergy";
 import Price from "~/components/crossoutstyle/Price";
 import { calculateProfit, calculateROI } from "~/lib/priceCalc";
 import PriceCard from "~/components/crossoutstyle/PriceCard";

@@ -2,7 +2,6 @@ import DataTable, { CategoryData, RarityData } from './DataTable';
 import { createColumnHelper } from '@tanstack/react-table';
 import Item from './Item';
 import Price from './Price';
-import chooseLocName from '~/lib/chooseLocName';
 import { type RouterOutputs } from '~/utils/api';
 import { useMemo } from 'react';
 
@@ -20,8 +19,6 @@ export default function MarketTable({
     rarities: RarityData;
     lang: string;
 }) {
-    if (!data) return <p>Not found</p>;
-
     const columnHelper = createColumnHelper<ItemFindManyWithMarketOutput>();
 
     const columns = useMemo(() => [
@@ -95,7 +92,7 @@ export default function MarketTable({
             header: 'Offers',
             cell: props => {
                 const val = props.getValue();
-                return val !== undefined ? val : 'N/A';
+                return val ?? 'N/A';
             },
             enableGlobalFilter: false,
         }),
@@ -113,7 +110,7 @@ export default function MarketTable({
             header: 'Orders',
             cell: props => {
                 const val = props.getValue();
-                return val !== undefined ? val : 'N/A';
+                return val ?? 'N/A';
             },
             enableGlobalFilter: false,
         }),
@@ -151,8 +148,10 @@ export default function MarketTable({
         ),
     ], []);
 
+    if (!data) return <p>Not found</p>;
+
     return (
-        <DataTable
+    <DataTable
             columns={columns}
             data={data}
             rarities={rarities}
