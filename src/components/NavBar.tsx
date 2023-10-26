@@ -32,14 +32,14 @@ export default function NavBar({ currentUser }: Props) {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>{t("common:navbar.packs")}</a>
+            <a>{t("navbar.packs")}</a>
           </li>
           <li tabIndex={0}>
             <details>
-              <summary>{t("common:navbar.tools.title")}</summary>
+              <summary>{t("navbar.tools.title")}</summary>
               <ul className="p-2">
                 <li>
-                  <a>{t("common:navbar.tools.badgeExchange")}</a>
+                  <a>{t("navbar.tools.badgeExchange")}</a>
                 </li>
               </ul>
             </details>
@@ -49,10 +49,10 @@ export default function NavBar({ currentUser }: Props) {
             locale: i18n.language === "en" ? "de" : "en",
           })
         }>
-            <a>{t("common:navbar.language")}</a>
+            <a>{t("navbar.language")}</a>
           </li>
           <li>
-            <a>{t("common:navbar.info")}</a>
+            <a>{t("navbar.info")}</a>
           </li>
         </ul>
       </div>
@@ -69,20 +69,20 @@ export default function NavBar({ currentUser }: Props) {
             >
               <li>
                 <a className="justify-between">
-                {t("common:navbar.user.profile")}
+                {t("navbar.user.profile")}
                   <span className="badge">New</span>
                 </a>
               </li>
               {currentUser.role === "ADMIN" && (
                 <li>
-                  <Link href="/admin">{t("common:navbar.user.adminPage")}</Link>
+                  <Link href="/admin">{t("navbar.user.adminPage")}</Link>
                 </li>
               )}
               <li>
-                <a>{t("common:navbar.user.settings")}</a>
+                <a>{t("navbar.user.settings")}</a>
               </li>
               <li>
-                <a onClick={() => void signOut()}>{t("common:navbar.user.signOut")}</a>
+                <a onClick={() => void signOut()}>{t("navbar.user.signOut")}</a>
               </li>
             </ul>
           </div>
@@ -91,7 +91,7 @@ export default function NavBar({ currentUser }: Props) {
             className="btn btn-ghost rounded-btn"
             onClick={() => void signIn()}
           >
-            {t("common:navbar.user.signIn")}
+            {t("navbar.user.signIn")}
           </button>
         )}
       </div>
