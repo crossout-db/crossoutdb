@@ -1,0 +1,26 @@
+{
+    "welcome": "Willkommen",
+    "navbar": {
+        "packs": "Packungen",
+        "tools": {
+            "title": "Werkzeuge",
+            "badgeExchange": "Abzeichen-Austausch"
+        },
+        "info": "Die Info",
+        "language": "Sprache",
+        "user": {
+            "signIn": "Anmelden",
+            "signOut": "Abmelden",
+            "profile": "Profil",
+            "settings": "Einstellungen",
+            "adminPage": "Administrator Seite"
+        }
+
+    },
+    "admin": {
+        "title": "Administrator Seite",
+        "users": "Benutzer",
+        "items": "Artikel",
+        "recipes": "Rezepte"
+    }
+}

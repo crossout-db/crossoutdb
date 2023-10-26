@@ -435,3 +435,43 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model Country {
+    code String @id
+    name String
+    currency String
+    currencyCode String
+
+    // everyone
+    @@allow('read', true)
+
+    // only the ADMIN
+    @@allow('create,update,delete', auth().role == "ADMIN")
+}
+
+model Language {
+    code String @id
+    name String
+
+    translations Translation[]
+
+    // everyone
+    @@allow('read', true)
+
+    // only the ADMIN
+    @@allow('create,update,delete', auth().role == "ADMIN")
+}
+
+model Translation {
+    id Int @id @default(autoincrement())
+    language Language @relation(fields: [languageCode], references: [code])
+    languageCode String
+    key String
+    value String
+
+    // everyone
+    @@allow('read', true)
+
+    // only the ADMIN
+    @@allow('create,update,delete', auth().role == "ADMIN")
+}

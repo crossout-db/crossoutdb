@@ -3,6 +3,8 @@ import { signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import Avatar from "./Avatar";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import ManageUsers from "./ManageUsers";
 
 type Props = {
@@ -10,6 +12,8 @@ type Props = {
 };
 
 export default function NavBar({ currentUser }: Props) {
+  const router = useRouter();
+  const { t, i18n } = useTranslation();
   return (
     <div className="navbar border-b bg-base-100 px-8 py-2 " data-theme="dark">
       <div className="navbar-start">
@@ -28,23 +32,27 @@ export default function NavBar({ currentUser }: Props) {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>Packs</a>
+            <a>{t("common:navbar.packs")}</a>
           </li>
           <li tabIndex={0}>
             <details>
-              <summary>Tools</summary>
+              <summary>{t("common:navbar.tools.title")}</summary>
               <ul className="p-2">
                 <li>
-                  <a>Calc Crafting</a>
-                </li>
-                <li>
-                  <a>Reduce Crafting</a>
+                  <a>{t("common:navbar.tools.badgeExchange")}</a>
                 </li>
               </ul>
             </details>
           </li>
+          <li onClick={() =>
+          void router.push(router.pathname, router.asPath, {
+            locale: i18n.language === "en" ? "de" : "en",
+          })
+        }>
+            <a>{t("common:navbar.language")}</a>
+          </li>
           <li>
-            <a>Info</a>
+            <a>{t("common:navbar.info")}</a>
           </li>
         </ul>
       </div>
@@ -61,20 +69,20 @@ export default function NavBar({ currentUser }: Props) {
             >
               <li>
                 <a className="justify-between">
-                  Profile
+                {t("common:navbar.user.profile")}
                   <span className="badge">New</span>
                 </a>
               </li>
               {currentUser.role === "ADMIN" && (
                 <li>
-                  <Link href="/admin">Site Administration</Link>
+                  <Link href="/admin">{t("common:navbar.user.adminPage")}</Link>
                 </li>
               )}
               <li>
-                <a>Settings</a>
+                <a>{t("common:navbar.user.settings")}</a>
               </li>
               <li>
-                <a onClick={() => void signOut()}>Logout</a>
+                <a onClick={() => void signOut()}>{t("common:navbar.user.signOut")}</a>
               </li>
             </ul>
           </div>
@@ -83,7 +91,7 @@ export default function NavBar({ currentUser }: Props) {
             className="btn btn-ghost rounded-btn"
             onClick={() => void signIn()}
           >
-            Sign in
+            {t("common:navbar.user.signIn")}
           </button>
         )}
       </div>

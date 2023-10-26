@@ -1,6 +1,9 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { type AppType } from "next/app";
+import { type AppType, type AppProps } from "next/app";
+import nextI18NextConfig from 'next-i18next.config.mjs'
+import { appWithTranslation } from "next-i18next";
+import { type ComponentType } from "react";
 
 import { api } from "~/utils/api";
 
@@ -17,4 +20,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   );
 };
 
-export default api.withTRPC(MyApp);
+export default appWithTranslation(
+  api.withTRPC(MyApp) as ComponentType<AppProps<unknown>>,
+  nextI18NextConfig
+);
+
+// export default api.withTRPC(MyApp);

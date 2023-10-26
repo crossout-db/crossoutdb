@@ -5,6 +5,7 @@ import { getEnhancedPrisma } from "../server/enhanced-db";
 import { useCurrentUser } from "../lib/context";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import { MarketTable } from "~/components/MarketTable";
 import { useFindManyPack } from "zenstack/generated/swr/hooks";
 import UpdatePackPrices from "./api/cron/UpdatePackPrices";
@@ -14,6 +15,7 @@ const Home: NextPage = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
   const { status } = useSession();
+  const { t, i18n } = useTranslation();
   // const { data: packs } = useFindManyPack({select: {steamAppID: true}});
   // const { data: packs } = trpc.pack.findMany.useQuery({
   //   select: { steamAppId: true },
@@ -31,7 +33,7 @@ const Home: NextPage = () => {
     <WithNavBar>
       <div className="mt-8 flex w-full flex-col items-center text-center">
         {currentUser && (
-          <h1 className="text-2xl text-gray-800">Welcome {currentUser.name}!</h1>
+          <h1 className="text-2xl text-gray-800">{t("common:welcome")} {currentUser.name}!</h1>
         )}
 
         <div className="w-full p-8">

@@ -1,0 +1,26 @@
+{
+    "welcome": "Welcome",
+    "navbar": {
+        "packs": "Packs",
+        "tools": {
+            "title": "Tools",
+            "badgeExchange": "Badge Exchange"
+        },
+        "info": "Info",
+        "language": "Language",
+        "user": {
+            "signIn": "Sign In",
+            "signOut": "Sign Out",
+            "profile": "Profile",
+            "settings": "Settings",
+            "adminPage": "Admin Page"
+        }
+
+    },
+    "admin": {
+        "title": "Admin Page",
+        "users": "Users",
+        "items": "Items",
+        "recipes": "Recipes"
+    }
+}
