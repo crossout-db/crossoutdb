@@ -24,10 +24,6 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
             name: 'Home',
             href: '/',
         },
-        {
-            name: 'Market',
-            href: '/market',
-        },
     ];
 
     const userLinks = [
