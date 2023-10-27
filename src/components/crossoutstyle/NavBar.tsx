@@ -98,7 +98,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
                   >
                     <ul>
                       {userLinks.map((entry) => (
-                        <li className="whitespace-nowrap hover:text-white">
+                        <li key={entry.name} className="whitespace-nowrap hover:text-white">
                           {entry.href ? (
                             <Link href={entry.href}>{entry.name}</Link>
                           ) : (

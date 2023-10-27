@@ -1,9 +1,7 @@
 import { ChevronRight } from "react-feather";
-import { RouterOutputs } from "~/utils/api";
 import Synergy from "./Synergy";
 import { useTranslation } from "next-i18next";
-
-type ItemFindUniqueOutput = RouterOutputs["item"]["findUnique"];
+import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 interface SynergyCardProps {
     data: ItemFindUniqueOutput;

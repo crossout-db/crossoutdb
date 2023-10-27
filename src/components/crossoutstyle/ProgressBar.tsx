@@ -1,8 +1,3 @@
-import { calculateProfit, calculateROI } from "~/lib/priceCalc";
-import Price from "./Price";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { RouterOutputs } from "~/utils/api";
 
 interface ProgressBarProps {
     percent: number;

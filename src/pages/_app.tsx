@@ -6,7 +6,7 @@ import { appWithTranslation } from "next-i18next";
 import { type ComponentType } from "react";
 import Layout from "~/components/Layout";
 
-import { api } from "~/utils/api";
+import { trpc } from "~/lib/trpc";
 
 import "~/styles/globals.css";
 
@@ -24,7 +24,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 };
 
 export default appWithTranslation(
-  api.withTRPC(MyApp) as ComponentType<AppProps<unknown>>,
+  trpc.withTRPC(MyApp) as ComponentType<AppProps<unknown>>,
   nextI18NextConfig,
 );
 

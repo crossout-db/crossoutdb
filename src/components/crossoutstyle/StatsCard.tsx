@@ -1,13 +1,11 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { RouterOutputs } from "~/utils/api";
 import ProgressBar from "./ProgressBar";
 import { useTranslation } from "next-i18next";
-
-type ItemfindUniqueOutput = RouterOutputs["item"]["findUnique"];
+import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 interface StatsCardProps {
-    data: ItemfindUniqueOutput;
+    data: ItemFindUniqueOutput;
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({ data }) => {

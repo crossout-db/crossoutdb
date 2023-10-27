@@ -1,11 +1,8 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import { RouterOutputs } from "~/utils/api";
-
-type ItemfindUniqueOutput =
-  RouterOutputs["item"]["findUnique"];
+import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 interface CardProps {
-  item: ItemfindUniqueOutput;
+  item: ItemFindUniqueOutput;
 }
 
 export const Card: React.FC<CardProps> = ({ item }) => {

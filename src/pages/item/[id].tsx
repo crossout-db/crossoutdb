@@ -9,8 +9,6 @@ import { GetServerSideProps, type NextPage } from "next";
 import { getServerTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
 
-import { RouterOutputs, api } from "~/utils/api";
-
 import Price from "~/components/crossoutstyle/Price";
 import { calculateProfit, calculateROI } from "~/lib/priceCalc";
 import PriceCard from "~/components/crossoutstyle/PriceCard";
@@ -20,6 +18,9 @@ import StatsCard from "~/components/crossoutstyle/StatsCard";
 import dayjs from "dayjs";
 import SynergyCard from "~/components/crossoutstyle/SynergyCard";
 import RecipeCard from "~/components/crossoutstyle/RecipeCard";
+import { trpc } from "~/lib/trpc";
+
+import { Prisma } from "@prisma/client";
 
 type Props = {
   // Add custom props here
@@ -29,10 +30,203 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+const createRecipeTree = (depth: number): object | boolean => {
+  if (depth <= 0) return true;
+
+  return {
+    include: {
+      recipes: {
+        include: {
+          ingredients: {
+            include: {
+              item: createRecipeTree(depth - 1),
+            },
+          },
+        },
+      },
+    },
+  };
+};
+
+const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
+  include: {
+    type: true,
+    category: true,
+    faction: true,
+    rarity: true,
+    itemStats: {
+      orderBy: {
+        timestamp: "desc",
+      },
+      take: 1,
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        release: true,
+      },
+    },
+    recipes: {
+      include: {
+        ingredients: {
+          include: {
+            item: createRecipeTree(3),
+          },
+        },
+      },
+    },
+    market: {
+      orderBy: {
+        timestamp: "desc",
+      },
+      take: 1,
+    },
+    itemSynergies: {
+      include: {
+        synergy: {
+          include: {
+            synergyItems: {
+              include: {
+                item: {
+                  include: {
+                    rarity: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
+export type ItemFindUniqueOutput = Prisma.ItemGetPayload<typeof itemArgs>;
+
+function findUniqueItem(item_id: number) {
+  const { data } = trpc.item.findUnique.useQuery({
+    where: { id: item_id },
+    include: {
+      type: true,
+      category: true,
+      faction: true,
+      rarity: true,
+      itemStats: {
+        orderBy: {
+          timestamp: "desc",
+        },
+        take: 1,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          release: true,
+        },
+      },
+      recipes: {
+        include: {
+          ingredients: {
+            include: {
+              item: createRecipeTree(3),
+            },
+          },
+        },
+      },
+      market: {
+        orderBy: {
+          timestamp: "desc",
+        },
+        take: 1,
+      },
+      itemSynergies: {
+        include: {
+          synergy: {
+            include: {
+              synergyItems: {
+                include: {
+                  item: {
+                    include: {
+                      rarity: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return data;
+}
+
 export default function ItemPage() {
   const router = useRouter();
   const item_id = parseInt(router.query.id as string, 10);
-  const { data } = api.item.findUnique.useQuery({ where: { id: item_id } });
+  const data = findUniqueItem(item_id);
+  // const { data } = trpc.item.findUnique.useQuery({
+  //   where: { id: item_id },
+  //   include: {
+  //     type: true,
+  //     category: true,
+  //     faction: true,
+  //     rarity: true,
+  //     itemStats: {
+  //       orderBy: {
+  //         timestamp: "desc",
+  //       },
+  //       take: 1,
+  //       include: {
+  //         user: {
+  //           select: {
+  //             name: true,
+  //           },
+  //         },
+  //         release: true,
+  //       },
+  //     },
+  //     recipes: {
+  //       include: {
+  //         ingredients: {
+  //           include: {
+  //             item: createRecipeTree(3),
+  //           },
+  //         },
+  //       },
+  //     },
+  //     market: {
+  //       orderBy: {
+  //         timestamp: "desc",
+  //       },
+  //       take: 1,
+  //     },
+  //     itemSynergies: {
+  //       include: {
+  //         synergy: {
+  //           include: {
+  //             synergyItems: {
+  //               include: {
+  //                 item: {
+  //                   include: {
+  //                     rarity: true,
+  //                     category: true,
+  //                   },
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
   const { t } = useTranslation();
 
   if (!data) return <></>;

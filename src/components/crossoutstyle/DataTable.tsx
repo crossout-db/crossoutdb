@@ -80,7 +80,7 @@ const CategoryFilter = ({
             }
 
             if (categories.includes(category)) {
-                let newCategories = categories.filter(c => c !== category);
+                const newCategories = categories.filter(c => c !== category);
                 newCategories.length === 0 && newCategories.push(0);
                 setCategories(newCategories);
                 column.setFilterValue(newCategories);
@@ -143,11 +143,11 @@ const RarityFilter = ({
         const column = table.getAllColumns().find(c => c.id === 'rarityId');
         if (column) {
             if (rarities.includes(rarity)) {
-                let newRarities = rarities.filter(c => c !== rarity);
+                const newRarities = rarities.filter(c => c !== rarity);
                 setRarities(newRarities);
                 column.setFilterValue(newRarities);
             } else {
-                let newRarities = uniq([...rarities, rarity]);
+                const newRarities = uniq([...rarities, rarity]);
                 setRarities(newRarities);
                 column.setFilterValue(newRarities);
             }
@@ -244,7 +244,7 @@ const DataTable = ({
     const currentPageIndex = pagination.pageIndex;
     const { t } = useTranslation();
 
-    let pageButtons = [];
+    const pageButtons = [];
     const prevBtnMin = Math.max(
         0,
         currentPageIndex -

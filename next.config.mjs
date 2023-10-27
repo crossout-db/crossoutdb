@@ -17,6 +17,12 @@ const config = {
         port: '',
         pathname: '/avatars/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'crossoutdb.com',
+        port: '',
+        pathname: '/img/items/**',
+      },
     ],
   },
 

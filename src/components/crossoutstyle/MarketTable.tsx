@@ -2,13 +2,10 @@ import DataTable, { CategoryData, RarityData } from './DataTable';
 import { createColumnHelper } from '@tanstack/react-table';
 import Item from './Item';
 import Price from './Price';
-import { type RouterOutputs } from '~/utils/api';
 import { useMemo } from 'react';
 import { useTranslation } from "next-i18next";
 import { notFound } from 'next/navigation';
-
-type ItemFindManyWithMarketOutput =
-    RouterOutputs["item"]["findManyWithMarket"][number];
+import { ItemFindManyWithMarketOutput } from '~/pages/index';
 
 export default function MarketTable({
     data,

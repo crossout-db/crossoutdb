@@ -1,6 +1,7 @@
 import React from 'react';
 import rarityStyles from '~/lib/rarityStyles';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ItemProps {
     id: number;
@@ -31,15 +32,18 @@ const Button: React.FC<ItemProps> = ({ id, name, type, rarityId, size }) => {
             <div
                 className="text-left relative w-full flex"
                 style={{ height: edge - 2, width: edge - 2 }}>
-                <img
+                <Image
                     src={'https://crossoutdb.com/img/items/' + id + '.png'}
+                    alt={name}
                     className="block absolute"
-                    style={{
-                        width: edge,
-                        height: edge,
-                        top: -1,
-                        left: -1,
-                    }}
+                    width={edge}
+                    height={edge}
+                    // style={{
+                    //     width: edge,
+                    //     height: edge,
+                    //     top: -1,
+                    //     left: -1,
+                    // }}
                 />
                 <div
                     className="p-2 flex flex-col relative justify-center"

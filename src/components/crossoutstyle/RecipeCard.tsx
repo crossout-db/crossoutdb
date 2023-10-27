@@ -1,4 +1,3 @@
-import { RouterOutputs } from "~/utils/api";
 import Recipe from "./Recipe";
 import { Dispatch, SetStateAction, createContext, useState } from "react";
 import _ from "lodash";
@@ -6,8 +5,7 @@ import PrimaryButton from "./PrimaryButton";
 import { createRecipePath } from "~/lib/recipePath";
 import RecipeSummary from "./RecipeSummary";
 import { useTranslation } from "next-i18next";
-
-type ItemFindUniqueOutput = RouterOutputs["item"]["findUnique"];
+import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 export type RecipeContextData = {
     condensedItem: { name: string, id: number, rarityId: number },

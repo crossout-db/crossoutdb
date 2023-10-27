@@ -9,7 +9,7 @@ interface CategoryButtonProps {
 }
 
 const CategoryButton = ({ onClick, category, active, size }: CategoryButtonProps) => {
-    size = size || 42;
+    size = size ?? 42;
 
     let categoryName = '';
 
