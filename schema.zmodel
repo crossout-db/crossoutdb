@@ -35,7 +35,7 @@ model Release {
     url String?
     startDate DateTime?
     endDate DateTime?
-    active Boolean
+    active Boolean @default(true)
     itemStats ItemStats[]
     recipes Recipe[]
     packs Pack[]
@@ -52,6 +52,7 @@ model Release {
 
 model Recipe {
     id Int @id @default(autoincrement())
+    name String @default("Recipe_Primary")
     result Item @relation(fields: [resultItemId], references: [id])
     resultItemId Int
     quantity Int
@@ -59,7 +60,7 @@ model Recipe {
     releaseId Int?
     craftCost Int?
     timestamp DateTime? @default(now())
-    active Boolean
+    active Boolean @default(true)
     ingredients RecipeItem[]
 
     // everyone
@@ -96,7 +97,7 @@ model Pack {
     coins Int
     release Release? @relation(fields: [releaseId], references: [id])
     releaseId Int?
-    active Boolean
+    active Boolean @default(true)
     items PackItem[]
     steamAppPrices SteamAppPrice[]
 
@@ -149,7 +150,10 @@ model Category {
     id Int @id @default(autoincrement())
     name String
     items Item[]
+    translations Translation[]
 
+    @@unique([name])
+    
     // everyone
     @@allow('read', true)
 
@@ -173,7 +177,10 @@ model Type {
     id Int @id @default(autoincrement())
     name String
     items Item[]
+    translations Translation[]
 
+    @@unique([name])
+    
     // everyone
     @@allow('read', true)
 
@@ -181,10 +188,20 @@ model Type {
     @@allow('create,update,delete', auth().role == "ADMIN")
 }
 
+enum RarityImportEnum {
+    BASE
+    COMMON
+    RARE
+    VERY_RARE
+    EPIC
+    LEGENDARY
+    EXOTIC
+}
+
 model Rarity {
     id Int @id @default(autoincrement())
     name String
-    order Int
+    importKey RarityImportEnum
     primaryColor String
     secondaryColor String
     items Item[]
@@ -198,25 +215,28 @@ model Rarity {
 
 model Item {
     id Int @id @default(autoincrement())
+    oldId Int?
     name String
     marketDef String? @omit
     quantity Int
     type Type @relation(fields: [typeId], references: [id])
     typeId Int
+    oldTypeId Int?
     category Category @relation(fields: [categoryId], references: [id])
     categoryId Int
     faction Faction @relation(fields: [factionId], references: [id])
     factionId Int
     rarity Rarity @relation(fields: [rarityId], references: [id])
     rarityId Int
-    level Int
+    level Int @default(0)
     sellPriceMin Int?
     sellOrders Int?
     buyPriceMax Int?
     buyOrders Int?
     craftCost Int?
     timestamp DateTime? @default(now())
-    active Boolean
+    saleable Boolean @default(true)
+    active Boolean @default(true)
     logId Int?
 
     itemStats ItemStats[]
@@ -226,8 +246,10 @@ model Item {
     recipeItems RecipeItem[]
     packItems PackItem[]
     itemSynergies SynergyItem[]
+    translations Translation[]
 
     // Define a unique constraint on itemId
+    @@unique([name])
     @@unique([marketDef])
 
     // everyone
@@ -341,7 +363,7 @@ model BadgeExchange {
     itemId Int
     quantity Int
     badges Int
-    active Boolean
+    active Boolean @default(true)
     timestamp DateTime @default(now())
 
     // everyone
@@ -466,8 +488,14 @@ model Translation {
     id Int @id @default(autoincrement())
     language Language @relation(fields: [languageCode], references: [code])
     languageCode String
-    key String
+    key String 
     value String
+
+    categories Category[]
+    types Type[]
+    items Item[]
+
+    @@unique([languageCode, key])
 
     // everyone
     @@allow('read', true)

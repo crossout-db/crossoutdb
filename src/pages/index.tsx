@@ -11,12 +11,17 @@ import { Prisma } from "@prisma/client";
 
 type Props = {
   // Add custom props here
-}
+};
 
 const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
   include: {
-    type: true,
-    category: true,
+    translations: true,
+    type: {
+      include: { translations: true },
+    },
+    category: {
+      include: { translations: true },
+    },
     faction: true,
     rarity: true,
     market: {
@@ -28,13 +33,20 @@ const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
   },
 });
 
-export type ItemFindManyWithMarketOutput = Prisma.ItemGetPayload<typeof itemArgs>;
+export type ItemFindManyWithMarketOutput = Prisma.ItemGetPayload<
+  typeof itemArgs
+>;
 
 function findManyItem() {
   const { data } = trpc.item.findMany.useQuery({
     include: {
-      type: true,
-      category: true,
+      translations: true,
+      type: {
+        include: { translations: true },
+      },
+      category: {
+        include: { translations: true },
+      },
       faction: true,
       rarity: true,
       market: {
@@ -77,7 +89,7 @@ const Market: NextPage = () => {
       data.map((item) => {
         return {
           xodbId: item.rarity.id,
-          order: item.rarity.order,
+          order: item.rarity.id,
           LocNames: [{ name: item.rarity.name }],
         };
       }),
@@ -99,10 +111,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerTranslations(locale ?? 'en', [
-      'common','model'
-    ])),
+    ...(await getServerTranslations(locale ?? "en", ["common", "model"])),
   },
-})
+});
 
 export default Market;

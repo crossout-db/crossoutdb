@@ -10,7 +10,7 @@ const config = {
   debug: process.env.NODE_ENV === 'development',
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'de'],
+    locales: ['en', 'de', 'ru', 'zh'],
   },
   /** To avoid issues when deploying to some paas (vercel...) */
   localePath: typeof window === 'undefined'

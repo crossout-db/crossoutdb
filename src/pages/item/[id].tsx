@@ -50,8 +50,13 @@ const createRecipeTree = (depth: number): object | boolean => {
 
 const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
   include: {
-    type: true,
-    category: true,
+    translations: true,
+    type: {
+      include: { translations: true },
+    },
+    category: {
+      include: { translations: true },
+    },
     faction: true,
     rarity: true,
     itemStats: {
@@ -59,14 +64,14 @@ const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
         timestamp: "desc",
       },
       take: 1,
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
-        release: true,
-      },
+      // include: {
+      //   user: {
+      //     select: {
+      //       name: true,
+      //     },
+      //   },
+      //   release: true,
+      // },
     },
     recipes: {
       include: {
@@ -110,8 +115,13 @@ function findUniqueItem(item_id: number) {
   const { data } = trpc.item.findUnique.useQuery({
     where: { id: item_id },
     include: {
-      type: true,
-      category: true,
+      translations: true,
+      type: {
+        include: { translations: true },
+      },
+      category: {
+        include: { translations: true },
+      },
       faction: true,
       rarity: true,
       itemStats: {
@@ -119,14 +129,14 @@ function findUniqueItem(item_id: number) {
           timestamp: "desc",
         },
         take: 1,
-        include: {
-          user: {
-            select: {
-              name: true,
-            },
-          },
-          release: true,
-        },
+        // include: {
+        //   user: {
+        //     select: {
+        //       name: true,
+        //     },
+        //   },
+        //   release: true,
+        // },
       },
       recipes: {
         include: {
@@ -240,7 +250,8 @@ export default function ItemPage() {
           height={128}
         />
         <div className="block space-y-2">
-          <h1 className="text-3xl text-white">{data.name}</h1>
+
+          <h1 className="text-3xl text-white">{data.translations.find((t) => t.languageCode === "en")?.value}</h1>
           <div className="space-x-1">
             <span
               className={`rounded-lg px-2 py-0.5 font-bold ${
@@ -254,14 +265,14 @@ export default function ItemPage() {
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data.category.name}
+              {data?.category.translations.find((t) => t.languageCode === "en")?.value}
             </span>
             <span
               className={
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data.type.name}
+              {data?.type.translations.find((t) => t.languageCode === "en")?.value}
             </span>
             <span
               className={

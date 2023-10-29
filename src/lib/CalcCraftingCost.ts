@@ -46,7 +46,7 @@ export async function CalcCraftingCosts() {
     orderBy: {
       result: {
         rarity: {
-          order: "asc",
+          id: "asc",
         },
       },
     },

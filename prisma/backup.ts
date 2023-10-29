@@ -24,6 +24,9 @@ async function main() {
         synergyItem: await prisma.synergyItem.findMany({}),
         market: await prisma.market.findMany({}),
         badgeExchange: await prisma.badgeExchange.findMany({}),
+        country: await prisma.country.findMany({}),
+        language: await prisma.language.findMany({}),
+        translation: await prisma.translation.findMany({}),
         log: await prisma.log.findMany({}),
     }
     

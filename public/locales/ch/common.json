@@ -20,6 +20,7 @@
             "settings": "Settings",
             "adminPage": "Admin Page"
         }
+
     },
     "admin": {
         "title": "Admin Page",

@@ -29,8 +29,8 @@ export default function MarketTable({
                 return (
                     <Item
                         id={props.row.original.id}
-                        name={props.row.original.name}
-                        type={props.row.original.type.name}
+                        name={props.row.original.translations.find((t) => t.languageCode === "en")?.value ?? props.row.original.name}
+                        type={props.row.original.type.translations.find((t) => t.languageCode === "en")?.value ?? props.row.original.type.name}
                         rarityId={props.row.original.rarityId}
                         size="large"
                     />

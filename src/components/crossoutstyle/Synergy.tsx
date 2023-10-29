@@ -36,7 +36,7 @@ const Synergy: React.FC<SynergyProps> = ({ name, synergyItems }) => {
               <span className="font-bold">
                 {category[0]?.item.category.name}
               </span>
-              {sortBy(category, (x) => x.item.rarity.order).map((item) => (
+              {sortBy(category, (x) => x.item.rarity.id).map((item) => (
                 <Item
                     key={item.item.id}
                     id={item.item.id}
