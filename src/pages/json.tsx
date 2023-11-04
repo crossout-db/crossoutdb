@@ -4,10 +4,10 @@ import { useRouter } from "next/router";
 import { GetServerSideProps, type NextPage } from "next";
 import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
-import MarketTable from "~/components/crossoutstyle/MarketTable";
 import { uniqBy } from "lodash";
 import { trpc } from "~/lib/trpc";
 import { Prisma } from "@prisma/client";
+import MarketTableJson from "~/components/crossoutstyle/MarketTableJson";
 
 type Props = {
   // Add custom props here
@@ -15,13 +15,8 @@ type Props = {
 
 const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
   include: {
-    translations: true,
-    type: {
-      include: { translations: true },
-    },
-    category: {
-      include: { translations: true },
-    },
+    type: true,
+    category: true,
     faction: true,
     rarity: true,
     market: {
@@ -43,14 +38,9 @@ function findManyItem() {
       saleable: true,
     },
     include: {
-      translations: true,
-      type: {
-        include: { translations: true },
-      },
-      category: {
-        include: { translations: true },
-      },
-      faction: true,
+      type: true,
+      category: true,
+        faction: true,
       rarity: true,
       market: {
         orderBy: {
@@ -101,7 +91,7 @@ const Market: NextPage = () => {
   };
 
   return (
-    <MarketTable
+    <MarketTableJson
       data={data}
       categories={categories}
       rarities={rarities}
@@ -113,7 +103,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerSideTranslations(locale ?? "en", ["common", "model"])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common", "model", "db"])),
   },
 });
 

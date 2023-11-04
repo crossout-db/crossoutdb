@@ -25,8 +25,8 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
 
   const links = [
     {
-      name: t("home"),
-      href: "/",
+      name: t("navbar.packs"),
+      href: "/packs",
     },
   ];
 
@@ -76,7 +76,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
             <button className="border-xoPrimary text-xoPrimary flex items-center border bg-black px-3 py-2 hover:border-white"
             onClick={() =>
                 void router.push(router.pathname, router.asPath, {
-                  locale: i18n.language === "en" ? "de" : "en",
+                  locale: i18n.language === "en" ? "ru" : "en",
                 })
               }>{t("navbar.language")}</button>
         </div>

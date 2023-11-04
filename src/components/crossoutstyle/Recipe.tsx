@@ -11,6 +11,7 @@ import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
 import RecipeAlert from "./RecipeAlert";
 import { sortBy } from "lodash";
 import { ItemFindUniqueOutput } from "~/pages/item/[id]";
+import { useTranslation } from "next-i18next";
 
 const mapRecipes = (
   item: ItemFindUniqueOutput | undefined,
@@ -44,6 +45,8 @@ interface RecipeProps {
 
 const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   if (!item) return <></>;
+  const { t, i18n } = useTranslation(['common','model']);
+  const lang = i18n.language;
   
   const recipeContext = useContext(RecipeContext);
   const recipeState = recipeContext?.value.find(
@@ -141,7 +144,7 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
             <></>
           )}
           <Item
-            name={item.name}
+            name={item.translations?.find((tf) => tf.languageCode === lang)?.value ?? item.name}
             id={item.id}
             rarityId={item.rarityId}
             size="small"

@@ -332,15 +332,18 @@ model Session {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/// @@allow('create', true)
-/// @@allow('read,delete', auth() == this || auth().role == 'ADMIN')
+/// @@allow('read,create', true)
+/// @@allow('delete', auth() == this || auth().role == 'ADMIN')
 /// @@allow('update', auth().role == 'ADMIN')
 model User {
     id String @id() @default(cuid())
     name String?
     role UserRole @default(USER)
+    /// @omit
     email String? @unique()
+    /// @omit
     emailVerified DateTime?
+    /// @omit
     image String?
     accounts Account[]
     sessions Session[]

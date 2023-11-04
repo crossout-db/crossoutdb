@@ -6,7 +6,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { Tab } from "@headlessui/react";
 import { GetServerSideProps, type NextPage } from "next";
-import { getServerTranslations } from "~/lib/getServerTranslations";
+import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
 
 import Price from "~/components/crossoutstyle/Price";
@@ -35,6 +35,7 @@ const createRecipeTree = (depth: number): object | boolean => {
 
   return {
     include: {
+      translations: true,
       recipes: {
         include: {
           ingredients: {
@@ -77,7 +78,7 @@ const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
       include: {
         ingredients: {
           include: {
-            item: createRecipeTree(3),
+            item: createRecipeTree(7),
           },
         },
       },
@@ -129,20 +130,20 @@ function findUniqueItem(item_id: number) {
           timestamp: "desc",
         },
         take: 1,
-        // include: {
-        //   user: {
-        //     select: {
-        //       name: true,
-        //     },
-        //   },
-        //   release: true,
-        // },
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          release: true,
+        },
       },
       recipes: {
         include: {
           ingredients: {
             include: {
-              item: createRecipeTree(3),
+              item: createRecipeTree(7),
             },
           },
         },
@@ -237,7 +238,8 @@ export default function ItemPage() {
   //     },
   //   },
   // });
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
 
   if (!data) return <></>;
 
@@ -251,7 +253,7 @@ export default function ItemPage() {
         />
         <div className="block space-y-2">
 
-          <h1 className="text-3xl text-white">{data.translations.find((t) => t.languageCode === "en")?.value}</h1>
+          <h1 className="text-3xl text-white">{data.translations.find((tf) => tf.languageCode === lang)?.value}</h1>
           <div className="space-x-1">
             <span
               className={`rounded-lg px-2 py-0.5 font-bold ${
@@ -265,14 +267,14 @@ export default function ItemPage() {
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.category.translations.find((t) => t.languageCode === "en")?.value}
+              {data?.category.translations.find((tf) => tf.languageCode === lang)?.value}
             </span>
             <span
               className={
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.type.translations.find((t) => t.languageCode === "en")?.value}
+              {data?.type.translations.find((tf) => tf.languageCode === lang)?.value}
             </span>
             <span
               className={
@@ -309,6 +311,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerTranslations(locale ?? "en", ["common", "model"])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common", "model"])),
   },
 });

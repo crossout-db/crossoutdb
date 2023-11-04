@@ -4,6 +4,7 @@
  * for Docker builds.
  */
 await import("./src/env.mjs");
+import i18nConfig from "./next-i18next.config.mjs";
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -23,6 +24,12 @@ const config = {
         port: '',
         pathname: '/img/items/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.akamai.steamstatic.com',
+        port: '',
+        pathname: '/steam/apps/**',
+      },
     ],
   },
 
@@ -32,10 +39,7 @@ const config = {
    *
    * @see https://github.com/vercel/next.js/issues/41980
    */
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'de'],
-  },
+  i18n: i18nConfig.i18n,
 
   eslint: {
     ignoreDuringBuilds: true,

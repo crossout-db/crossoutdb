@@ -7,7 +7,7 @@ import { useTranslation } from "next-i18next";
 import { notFound } from 'next/navigation';
 import { ItemFindManyWithMarketOutput } from '~/pages/index';
 
-export default function MarketTable({
+export default function MarketTableJson({
     data,
     categories,
     rarities,
@@ -16,7 +16,7 @@ export default function MarketTable({
     categories: CategoryData;
     rarities: RarityData;
 }) {
-    const { t, i18n } = useTranslation(['common','model']);
+    const { t, i18n } = useTranslation(['common','model', 'db']);
     const lang = i18n.language;
     const columnHelper = createColumnHelper<ItemFindManyWithMarketOutput>();
 
@@ -25,12 +25,16 @@ export default function MarketTable({
             id: 'item',
             header: t("model:item"),
             cell: props => {
+                const { id, name, type, rarityId } = props.row.original;
+                const tname = t(`db:${name}`);
+                const tTypeName = t(`db:${type.name}`);
+
                 return (
                     <Item
-                        id={props.row.original.id}
-                        name={props.row.original.translations.find((tf) => tf.languageCode === lang)?.value ?? props.row.original.name}
-                        type={props.row.original.type.translations.find((tf) => tf.languageCode === lang)?.value ?? props.row.original.type.name}
-                        rarityId={props.row.original.rarityId}
+                        id={id}
+                        name={tname}
+                        type={tTypeName}
+                        rarityId={rarityId}
                         size="large"
                     />
                 );

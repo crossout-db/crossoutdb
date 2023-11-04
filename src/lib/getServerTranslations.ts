@@ -6,7 +6,7 @@ import nextI18nextConfig from 'next-i18next.config.mjs'
 
 type ArrayElementOrSelf<T> = T extends Array<infer U> ? U[] : T[];
 
-export const getServerTranslations = async (
+export const getServerSideTranslations = async (
   locale: string,
   namespacesRequired?: ArrayElementOrSelf<Namespace> | string | string[] | undefined,
   configOverride?: UserConfig | null,

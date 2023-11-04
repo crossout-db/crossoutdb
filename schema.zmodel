@@ -432,19 +432,19 @@ model User {
     id String @id @default(cuid())
     name String?
     role UserRole @default(USER)
-    email String? @unique
-    emailVerified DateTime?
-    image String?
+    email String? @unique @omit
+    emailVerified DateTime? @omit
+    image String? @omit
     accounts Account[]
     sessions Session[]
     itemStats ItemStats[]
     log Log[]
 
     // everyone can create a profile
-    @@allow('create', true)
+    @@allow('read,create', true)
 
     // only the user can read or delete their own profile
-    @@allow('read,delete', auth() == this || auth().role == "ADMIN")
+    @@allow('delete', auth() == this || auth().role == "ADMIN")
 
     // only the ADMIN can update a profile
     @@allow('update', auth().role == "ADMIN")

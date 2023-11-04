@@ -10,6 +10,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
+    "toc": "i18next-resources-for-ts toc -i ./locales/en -o ./@types/resources.ts",
     "vercel-build": "zenstack generate && next build && prisma db push"
   },
   "dependencies": {

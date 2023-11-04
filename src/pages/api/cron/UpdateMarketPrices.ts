@@ -98,7 +98,7 @@ export default async function UpdateMarketPrices(
       });
     }
 
-    // await db.market.createMany({ data: batchMarketPrices });
+    await db.market.createMany({ data: batchMarketPrices });
     const {recipeCraftCosts, itemCraftCosts, itemPrices} =
       await CalcCraftingCosts();
 

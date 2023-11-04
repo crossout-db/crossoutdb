@@ -4,7 +4,7 @@ import { Tab } from "@headlessui/react";
 import AdminUsers from "~/components/AdminUsers";
 import AdminItems from "~/components/AdminItems";
 import { GetServerSideProps, type NextPage } from "next";
-import { getServerTranslations } from "~/lib/getServerTranslations";
+import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
 
 type Props = {
@@ -87,6 +87,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerTranslations(locale ?? "en", ["common", "model"])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common", "model"])),
   },
 });
