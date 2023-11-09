@@ -210,14 +210,14 @@ export default function ItemPage() {
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.category.translations.find((tf) => tf.languageCode === lang)?.value}
+              {data?.category.translations.find((tf) => tf.languageCode === lang)?.value ?? data?.category.name}
             </span>
             <span
               className={
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.type.translations.find((tf) => tf.languageCode === lang)?.value}
+              {data?.type.translations.find((tf) => tf.languageCode === lang)?.value ?? data?.type.name}
             </span>
             <span
               className={
