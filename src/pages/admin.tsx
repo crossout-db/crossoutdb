@@ -2,7 +2,7 @@ import { useCurrentUser } from "../lib/context";
 import Error from "next/error";
 import { Tab } from "@headlessui/react";
 import AdminUsers from "~/components/AdminUsers";
-import AdminItems from "~/components/AdminItems";
+// import AdminItems from "~/components/AdminItems";
 import { GetServerSideProps, type NextPage } from "next";
 import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
@@ -73,7 +73,7 @@ export default function Admin() {
               <AdminUsers />
             </Tab.Panel>
             <Tab.Panel>
-              <AdminItems />
+              {/* <AdminItems /> */}
             </Tab.Panel>
             <Tab.Panel>{t("admin.recipes")}</Tab.Panel>
           </Tab.Panels>

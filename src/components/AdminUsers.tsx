@@ -27,7 +27,7 @@ export default function AdminUsers() {
               className="modal-button mr-1 cursor-pointer"
               htmlFor="management-modal"
             >
-              {users?.map((user) => (
+              {users.map((user) => (
                 <li
                   key={user.id}
                   onClick={() => setSelectedUserId(user.id)}

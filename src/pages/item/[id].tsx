@@ -49,8 +49,7 @@ const createRecipeTree = (depth: number): object | boolean => {
   };
 };
 
-const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
-  include: {
+const itemInclude = Prisma.validator<Prisma.ItemInclude>()({
     translations: true,
     type: {
       include: { translations: true },
@@ -107,72 +106,16 @@ const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
         },
       },
     },
-  },
 });
 
-export type ItemFindUniqueOutput = Prisma.ItemGetPayload<typeof itemArgs>;
+export type ItemFindUniqueOutput = Prisma.ItemGetPayload<{
+  include: typeof itemInclude,
+}>;
 
 function findUniqueItem(item_id: number) {
   const { data } = trpc.item.findUnique.useQuery({
     where: { id: item_id },
-    include: {
-      translations: true,
-      type: {
-        include: { translations: true },
-      },
-      category: {
-        include: { translations: true },
-      },
-      faction: true,
-      rarity: true,
-      itemStats: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: 1,
-        include: {
-          user: {
-            select: {
-              name: true,
-            },
-          },
-          release: true,
-        },
-      },
-      recipes: {
-        include: {
-          ingredients: {
-            include: {
-              item: createRecipeTree(7),
-            },
-          },
-        },
-      },
-      market: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: 1,
-      },
-      itemSynergies: {
-        include: {
-          synergy: {
-            include: {
-              synergyItems: {
-                include: {
-                  item: {
-                    include: {
-                      rarity: true,
-                      category: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+    include: itemInclude,
   });
 
   return data;

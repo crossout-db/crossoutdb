@@ -13,8 +13,7 @@ type Props = {
   // Add custom props here
 };
 
-const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
-  include: {
+const itemInclude = Prisma.validator<Prisma.ItemInclude>()({
     translations: true,
     type: {
       include: { translations: true },
@@ -30,35 +29,18 @@ const itemArgs = Prisma.validator<Prisma.ItemDefaultArgs>()({
       },
       take: 1,
     },
-  },
 });
 
-export type ItemFindManyWithMarketOutput = Prisma.ItemGetPayload<
-  typeof itemArgs
->;
+export type ItemFindManyWithMarketOutput = Prisma.ItemGetPayload<{
+  include: typeof itemInclude,
+}>;
 
 function findManyItem() {
   const { data } = trpc.item.findMany.useQuery({
     where: {
       saleable: true,
     },
-    include: {
-      translations: true,
-      type: {
-        include: { translations: true },
-      },
-      category: {
-        include: { translations: true },
-      },
-      faction: true,
-      rarity: true,
-      market: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: 1,
-      },
-    },
+    include: itemInclude,
   });
 
   return data;

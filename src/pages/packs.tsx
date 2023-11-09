@@ -10,8 +10,7 @@ type Props = {
   // Add custom props here
 };
 
-const packArgs = Prisma.validator<Prisma.PackDefaultArgs>()({
-  include: {
+const packInclude = Prisma.validator<Prisma.PackInclude>()({
     items: {
       include: {
         item: true,
@@ -23,9 +22,10 @@ const packArgs = Prisma.validator<Prisma.PackDefaultArgs>()({
       },
       take: 1,
     },
-  },
 });
-export type PackFindManyOutput = Prisma.PackGetPayload<typeof packArgs>;
+export type PackFindManyOutput = Prisma.PackGetPayload<{
+  include: typeof packInclude,
+}>;
 
 const PacksPage: React.FC = () => {
   const { t } = useTranslation();
@@ -33,19 +33,7 @@ const PacksPage: React.FC = () => {
     where: {
       active: true,
     },
-    include: {
-      items: {
-        include: {
-          item: true,
-        },
-      },
-        steamAppPrices: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: 1,
-      },
-    },
+    include: packInclude,
   });
 
   if (isLoading || packs === undefined) {
@@ -53,11 +41,17 @@ const PacksPage: React.FC = () => {
   }
 
   return (
-    <div>
-      {packs.map((pack) => (
-        <PackCard key={pack.id} pack={pack} />
-      ))}
-    </div>
+    <>
+      <section className=" container mx-auto flex flex-col justify-between gap-2 pb-[20rem]">
+        <div className="w-full  px-[2.5rem]">
+          <div className="about-cards flex flex-col gap-4 md:flex-row">
+            {packs.map((pack) => (
+              <PackCard key={pack.id} pack={pack} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
@@ -65,7 +59,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerSideTranslations(locale ?? "en", ["common", "model", "db"])),
+    ...(await getServerSideTranslations(locale ?? "en", [
+      "common",
+      "model",
+      "db",
+    ])),
   },
 });
 

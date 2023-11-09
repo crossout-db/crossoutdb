@@ -35,7 +35,7 @@ const Button: React.FC<ItemProps> = ({ id, name, type, rarityId, size }) => {
                 style={{ height: edge - 2, width: edge - 2 }}>
                 <ImageFallback
                     src={'https://crossoutdb.com/img/items/' + id + '.png'}
-                    fallbackSrc='/images/placeholder.png'
+                    fallbackSrc='/icons/crossoutdb.svg'
                     alt={name}
                     className="block absolute"
                     width={edge}
