@@ -53,8 +53,8 @@ model Release {
 model Recipe {
     id Int @id() @default(autoincrement())
     name String @default("Recipe_Primary")
-    result Item @relation(fields: [resultItemId], references: [id])
-    resultItemId Int
+    item Item @relation(fields: [itemId], references: [id])
+    itemId Int
     quantity Int
     release Release? @relation(fields: [releaseId], references: [id])
     releaseId Int?

@@ -33,10 +33,10 @@ export async function CalcCraftingCosts() {
     },
     distinct: ["itemId"],
   });
-  
+
   const recipes = await db.recipe.findMany({
     include: {
-      result: true,
+      item: true,
       ingredients: {
         include: {
           item: true,
@@ -44,20 +44,20 @@ export async function CalcCraftingCosts() {
       },
     },
     orderBy: {
-      result: {
+      item: {
         rarity: {
           id: "asc",
         },
       },
     },
   });
-  
+
   const itemCraftCosts: ItemCrafting[] = [];
   const recipeCraftCosts: RecipeCrafting[] = [];
 
   if (recipes) {
     for (const recipe of recipes) {
-      const recipeResultItemId = recipe.resultItemId;
+      const recipeResultItemId = recipe.itemId;
 
       /**************************/
       /**** Calc Recipe Cost ****/
@@ -101,8 +101,8 @@ export async function CalcCraftingCosts() {
 
       const recipeRecord: RecipeCrafting = {
         recipeId: recipe.id,
-        resultItemId: recipe.resultItemId,
-        resultItemName: recipe.result.name,
+        resultItemId: recipe.itemId,
+        resultItemName: recipe.item.name,
         craftCost: recipeCost,
         items: recipeItems,
       };
@@ -129,8 +129,8 @@ export async function CalcCraftingCosts() {
 
         itemCraftCosts.push({
           itemId: recipeResultItemId,
-          itemName: recipe.result.name,
-          itemQty: recipe.result.quantity,
+          itemName: recipe.item.name,
+          itemQty: recipe.item.quantity,
           recipeQty: recipe.quantity,
           sellPriceMin: itemPrice?.sellPriceMin ?? 0,
           sellOrders: itemPrice?.sellOrders ?? 0,

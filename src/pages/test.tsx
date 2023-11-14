@@ -1,5 +1,5 @@
 import { useCurrentUser } from "../lib/context";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { i18n, useTranslation } from "next-i18next";
 import { Prisma } from "@prisma/client";
@@ -109,7 +109,7 @@ function findUniqueItem(item_id: number) {
 //   );
 // }
 
-export default function TestPage() {
+const TestPage: NextPage = () => {
   const currentUser = useCurrentUser();
   const { t } = useTranslation();
 
@@ -130,11 +130,38 @@ export default function TestPage() {
   });
 
   const { data: user } = trpc.user.findMany.useQuery({});
+  console.log(user);
+
+  const { mutate: createRarity } = trpc.user.create.useMutation();
+  const { mutate: updateRarity } = trpc.user.update.useMutation();
+  const createRare: Prisma.UserCreateArgs = {
+    data: {
+      id: "test",
+      name: "test",
+    },
+  };
+
+  const handleCreate = async () => {
+    createRarity(createRare);
+  };
+
+  const handleUpdate = async () => {
+    updateRarity({
+        where: {
+            id: "test",
+        },
+        data: {
+            name: "tested3",
+        },
+    });
+  };
 
   return (
     <div className="mt-8 flex w-full flex-col items-center bg-white">
-      {/* <p>{JSON.stringify(itemArgs)}</p> */}
-      <pre>{trans(data)}</pre>
+      <button onClick={() => handleCreate()}>CREATE</button>
+      <button onClick={() => handleUpdate()}>UPDATE</button>
+      <p>{JSON.stringify(data)}</p>
+      {/* <pre>{trans(data)}</pre> */}
       {/* <pre>{data?.translations.find((t) => t.languageCode === "en")?.value}</pre>
       <pre>{data?.translations.find((t) => t.languageCode === "ru")?.value}</pre>
       <pre>{data?.type.translations.find((t) => t.languageCode === "en")?.value}</pre>
@@ -166,11 +193,11 @@ export default function TestPage() {
     },
   });
 
-  const translation1 =
-    fallback1.translations.find((t) => t.languageCode === i18n.language)
-      .value ||
-    fallback1.translations.find((t) => t.languageCode === "en").value ||
-    fallback1.key;
+  //   const translation1 =
+  //     fallback1.translations.find((t) => t.languageCode === i18n.language)
+  //       .value ||
+  //     fallback1.translations.find((t) => t.languageCode === "en").value ||
+  //     fallback1.key;
 
   const { data: fallback2 } = trpc.item.findUnique.useQuery({
     where: {
@@ -181,7 +208,7 @@ export default function TestPage() {
         where: {
           OR: [
             {
-              languageCode: i18n.language,
+              languageCode: i18n?.language,
             },
             {
               languageCode: "en",
@@ -192,8 +219,8 @@ export default function TestPage() {
     },
   });
 
-  const translation2 = fallback2.translations[0].value ?? fallback2.key;
-}
+  //   const translation2 = fallback2.translations[0].value ?? fallback2.key;
+};
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
@@ -253,3 +280,5 @@ function trans(
   return data.translations.find((t) => t.languageCode === i18n?.language)
     ?.value;
 }
+
+export default TestPage;
