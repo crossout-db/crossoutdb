@@ -57,7 +57,7 @@ model Recipe {
     itemId Int
     quantity Int
     release Release? @relation(fields: [releaseId], references: [id])
-    releaseId Int?
+    releaseId Int @default(1)
     craftCost Int?
     timestamp DateTime? @default(now())
     active Boolean @default(true)
@@ -86,7 +86,7 @@ model Pack {
     key String?
     coins Int
     release Release? @relation(fields: [releaseId], references: [id])
-    releaseId Int?
+    releaseId Int @default(1)
     active Boolean @default(true)
     items PackItem[]
     steamAppPrices SteamAppPrice[]
@@ -211,7 +211,7 @@ model ItemStats {
     user User @relation(fields: [userId], references: [id])
     userId String
     release Release? @relation(fields: [releaseId], references: [id])
-    releaseId Int?
+    releaseId Int @default(1)
     timestamp DateTime @default(now())
     description String?
     increasesDurability Int?
