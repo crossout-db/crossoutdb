@@ -14,7 +14,7 @@ import type {
   Recipe,
   RecipeItem,
   Release,
-  SteamAppPrice,
+  PackPrice,
   Synergy,
   SynergyItem,
   Translation,
@@ -34,7 +34,7 @@ export interface SeedData {
   recipeItem: RecipeItem[];
   pack: Pack[];
   packItem: PackItem[];
-  steamAppPrice: SteamAppPrice[];
+  packPrice: PackPrice[];
   category: Category[];
   faction: Faction[];
   type: Type[];
@@ -98,7 +98,7 @@ async function main() {
   }
   if (seedData.item && (process.argv[2] === "item" || process.argv[2] === "all")) {
     console.log("Updating item");
-    await useUpdateMany(seedData.item);
+    await updateItems(seedData.item);
   }
   if (seedData.itemStats && (process.argv[2] === "itemStats" || process.argv[2] === "all")) {
     console.log("Updating itemStats");
@@ -130,10 +130,10 @@ async function main() {
       data: seedData.packItem,
     });
   }
-  if (seedData.steamAppPrice && (process.argv[2] === "steamAppPrice" || process.argv[2] === "all")) {
-    console.log("Updating steamAppPrice");
-    await prisma.steamAppPrice.updateMany({
-      data: seedData.steamAppPrice,
+  if (seedData.packPrice && (process.argv[2] === "packPrice" || process.argv[2] === "all")) {
+    console.log("Updating packPrice");
+    await prisma.packPrice.updateMany({
+      data: seedData.packPrice,
     });
   }
   if (seedData.synergy && (process.argv[2] === "synergy" || process.argv[2] === "all")) {
@@ -184,7 +184,7 @@ async function main() {
   // }
 }
 
-async function useUpdateMany(items: Item[]) {
+async function updateItems(items: Item[]) {
   for (const item of items) {
     await prisma.item.update({
       where: {

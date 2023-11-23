@@ -32,7 +32,7 @@ export interface AppError {
   data?: string;
 }
 
-export default async function UpdateSteamApps(
+export default async function FetchSteamApps(
   request: NextApiRequest,
   response: NextApiResponse,
 ): Promise<void> {

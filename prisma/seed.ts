@@ -15,7 +15,7 @@ import {
   type Recipe,
   type RecipeItem,
   type Release,
-  type SteamAppPrice,
+  type PackPrice,
   type Synergy,
   type SynergyItem,
   type Translation,
@@ -33,7 +33,7 @@ export interface SeedData {
   recipeItem: RecipeItem[];
   pack: Pack[];
   packItem: PackItem[];
-  steamAppPrice: SteamAppPrice[];
+  packPrice: PackPrice[];
   category: Category[];
   faction: Faction[];
   type: Type[];
@@ -131,10 +131,10 @@ async function main() {
       data: seedData.packItem,
     });
   }
-  if (seedData.steamAppPrice && (process.argv[2] === "steamAppPrice" || process.argv[2] === "all")) {
-    console.log("Seeding steamAppPrice");
-    await prisma.steamAppPrice.createMany({
-      data: seedData.steamAppPrice,
+  if (seedData.packPrice && (process.argv[2] === "packPrice" || process.argv[2] === "all")) {
+    console.log("Seeding packPrice");
+    await prisma.packPrice.createMany({
+      data: seedData.packPrice,
     });
   }
   if (seedData.synergy && (process.argv[2] === "synergy" || process.argv[2] === "all")) {
