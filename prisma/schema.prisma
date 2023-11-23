@@ -123,8 +123,8 @@ model PackPrice {
     timestamp DateTime @default(now())
     currencyCode String
     price Int
-    priceOriginal Int
-    discount Int
+    priceOriginal Int?
+    discount Int?
 }
 
 /// @@allow('read', true)

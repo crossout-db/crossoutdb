@@ -16,7 +16,7 @@ const packInclude = Prisma.validator<Prisma.PackInclude>()({
         item: true,
       },
     },
-    steamAppPrices: {
+    packPrices: {
       orderBy: {
         timestamp: "desc",
       },

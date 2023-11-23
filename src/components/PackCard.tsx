@@ -23,13 +23,13 @@ const PackCard: React.FC<PackProps> = ({ pack }) => {
       className="card-item-div mt-2 flex min-h-[260px] w-full min-w-[360px] max-w-screen-md cursor-pointer flex-col items-center rounded-xl bg-white px-2 py-2 text-center shadow-2xl"
     >
       <h2 className="card-title">{pack.name}</h2>
-      <h2 className="card-title">{pack.steamAppId}</h2>
+      <h2 className="card-title">{pack.steamKey}</h2>
       <Link
-        href={`https://store.steampowered.com/app/${pack.steamAppId}`}
+        href={`https://store.steampowered.com/app/${pack.steamKey}`}
         target="_blank"
       >
         <Image
-          src={`https://cdn.akamai.steamstatic.com/steam/apps/${pack.steamAppId}/header.jpg`}
+          src={`https://cdn.akamai.steamstatic.com/steam/apps/${pack.steamKey}/header.jpg`}
           alt={pack.name}
           width={230}
           height={108}
@@ -67,17 +67,17 @@ const PackCard: React.FC<PackProps> = ({ pack }) => {
         <div className="flex flex-col">Steam Price:</div>
         <div className="flex flex-col">
           <h2 className="card-title">
-            {pack.steamAppPrices[0]?.priceUSD ?? 0}
+            {pack.packPrices[0]?.price ?? 0}
           </h2>
         </div>
         <div className="flex flex-col">
           <h2 className="card-title">
-            {pack.steamAppPrices[0]?.discount ?? 0}% off
+            {pack.packPrices[0]?.discount ?? 0}% off
           </h2>
         </div>
       </div>
       <div className="flex w-full flex-row">
-        Updated {pack.steamAppPrices[0]?.timestamp.toISOString() ?? -1}
+        Updated {pack.packPrices[0]?.timestamp.toISOString() ?? -1}
       </div>
     </div>
   );

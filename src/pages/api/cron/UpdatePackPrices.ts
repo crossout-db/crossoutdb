@@ -8,7 +8,7 @@ export interface AppDetailsPriceOverview {
 }
 
 export interface App {
-  appId: number;
+  appId: string;
   success: boolean;
   data: Data;
 }
@@ -27,7 +27,7 @@ export interface PriceOverview {
 }
 
 export interface AppError {
-  appId: number;
+  appId: string;
   countryCode: string[];
   data?: string;
 }
@@ -43,10 +43,8 @@ export default async function UpdatePackPrices(
   }
   try {
     const countryCodes = ["us", "de", "uk", "ru"];
-    const packs = await db.pack.findMany({
-      select: { steamAppId: true },
-    });
-    const appIds = packs?.map((pack) => pack.steamAppId).join(",");
+    const packs = await db.pack.findMany({});
+    const appIds = packs?.map((pack) => Number(pack.steamKey)).join(",");
 
     // const appIds = "759590,783870,764460,806120,809740,708490,853170,719670,708500,878630,643740,812760,887050,893760,960290,1034510,1034511,1049120,1049121,1059100,1076740,1076741,1141790,1158240,1,1158241,1192400,1193840,2,1015950,1254240,1276340,1356210,1356211,1437610,1437611,1475680,1558690,1558691,1563120,1584790,1585870,1598850,1585871,1637471,1637470,1637472,1637530"
 
@@ -57,31 +55,42 @@ export default async function UpdatePackPrices(
         .json({ error: "Failed to fetch a list of steam appIds" });
     }
 
-    const batchSteamAppPrices: Prisma.SteamAppPriceCreateManyInput[] = [];
+    const batchPackPrices: Prisma.PackPriceCreateManyInput[] = [];
     const batchAppErrors: AppError[] = [];
 
     for (const countryCode of countryCodes) {
-      await fetchSteamAppPrice(
+      await fetchPackPrice(
         countryCode,
         appIds,
-        batchSteamAppPrices,
+        batchPackPrices,
         batchAppErrors,
       );
     }
 
-    await db.steamAppPrice.createMany({ data: batchSteamAppPrices });
+    for (const packPrice of batchPackPrices) {
+      const pack = packs.find((p) => p.steamKey === packPrice.key);
+      if (typeof pack !== "undefined") {
+        packPrice.packId = pack.id;
+      } else {
+        console.error(
+          `Failed to find pack for steamKey: ${packPrice.key}`,
+        );
+      }
+    }
+
+    await db.packPrice.createMany({ data: batchPackPrices });
 
     if (batchAppErrors.length === 0) {
       return response
         .status(200)
-        .json({ success: true, data: batchSteamAppPrices });
+        .json({ success: true, data: batchPackPrices });
     } else {
       console.error("Error fetching one or more apps:", batchAppErrors);
       return response
         .status(200)
         .json({
           success: true,
-          data: batchSteamAppPrices,
+          data: batchPackPrices,
           appErrors: batchAppErrors,
         });
     }
@@ -91,10 +100,10 @@ export default async function UpdatePackPrices(
   }
 }
 
-async function fetchSteamAppPrice(
+async function fetchPackPrice(
   countryCode: string,
   appIds: string,
-  steamAppPrices: Prisma.SteamAppPriceCreateManyInput[],
+  packPrices: Prisma.PackPriceCreateManyInput[],
   appErrors: AppError[],
 ) {
   //name,price_overview,background,release_date
@@ -120,37 +129,27 @@ async function fetchSteamAppPrice(
         app.success &&
         app.data.price_overview !== undefined
       ) {
-        let steamAppPrice = steamAppPrices.find(
-          (p) => p.steamAppId === app.appId,
+        let packPrice = packPrices.find(
+          (p) => p.key === app.appId,
         );
-        if (typeof steamAppPrice === "undefined") {
-          steamAppPrice = {
-            steamAppId: app.appId,
+        if (typeof packPrice === "undefined") {
+          packPrice = {
+            source: "STEAM",
+            //TODO: Why do I have to surround this with quotes?
+            key: `${app.appId}`,
+            packId: 0,
+            currencyCode: countryCode,
+            price: 0,
+            priceOriginal: null,
+            discount: null,
             timestamp: new Date(),
-            priceUSD: 0,
-            priceEUR: 0,
-            priceGBP: 0,
-            priceRUB: 0,
-            discount: 0,
           };
-          steamAppPrices.push(steamAppPrice);
+          packPrices.push(packPrice);
         }
 
-        switch (countryCode) {
-          case "us":
-            steamAppPrice.priceUSD = app.data.price_overview.final;
-            steamAppPrice.discount = app.data.price_overview.discount_percent;
-            break;
-          case "de":
-            steamAppPrice.priceEUR = app.data.price_overview.final;
-            break;
-          case "uk":
-            steamAppPrice.priceGBP = app.data.price_overview.final;
-            break;
-          case "ru":
-            steamAppPrice.priceRUB = app.data.price_overview.final;
-            break;
-        }
+        packPrice.price = app.data.price_overview.final;
+        packPrice.discount = app.data.price_overview.discount_percent;
+
       } else {
         let appError = appErrors.find((e) => e.appId === app.appId);
         if (typeof appError === "undefined") {
@@ -165,7 +164,7 @@ async function fetchSteamAppPrice(
     }
   } else {
     const appError: AppError = {
-      appId: 0,
+      appId: "",
       countryCode: [],
       data: data,
     };
