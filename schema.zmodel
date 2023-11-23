@@ -93,6 +93,7 @@ model Pack {
     name String
     description String?
     steamAppId Int
+    gaijinId Int?
     key String?
     coins Int
     release Release? @relation(fields: [releaseId], references: [id])

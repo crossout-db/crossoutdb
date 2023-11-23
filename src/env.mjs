@@ -35,6 +35,7 @@ export const env = createEnv({
     // GITHUB_CLIENT_SECRET: z.string(),
     CROSSOUT_MARKET_URL: z.string().url(),
     STEAM_APP_DETAILS_URL: z.string().url(),
+    GAIJIN_STORE_URL: z.string().url(),
     REST_URL: z.string().url(),
   },
 
@@ -62,6 +63,7 @@ export const env = createEnv({
     // GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     CROSSOUT_MARKET_URL: process.env.CROSSOUT_MARKET_URL,
     STEAM_APP_DETAILS_URL: process.env.STEAM_APP_DETAILS_URL,
+    GAIJIN_STORE_URL: process.env.GAIJIN_STORE_URL,
     REST_URL: process.env.REST_URL,
   },
   /**

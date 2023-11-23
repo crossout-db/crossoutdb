@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
-import { Prisma } from '@prisma/client'
+import { Prisma } from "@prisma/client";
 
 export interface AppDetailsPriceOverview {
   apps: App[];
@@ -32,14 +32,14 @@ export interface AppError {
   data?: string;
 }
 
-export default async function UpdatePackPrices(
+export default async function UpdateSteamApps(
   request: NextApiRequest,
   response: NextApiResponse,
 ): Promise<void> {
   const authHeader = request.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      console.error("Failed authorization");
-      return response.status(401).json({ success: false });
+    console.error("Failed authorization");
+    return response.status(401).json({ success: false });
   }
   try {
     const countryCodes = ["us", "de", "uk", "ru"];
@@ -52,7 +52,9 @@ export default async function UpdatePackPrices(
 
     if (typeof appIds === "undefined" || appIds === "") {
       console.error("Failed to fetch a list of steam appIds");
-      return response.status(500).json({ error: "Failed to fetch a list of steam appIds" });
+      return response
+        .status(500)
+        .json({ error: "Failed to fetch a list of steam appIds" });
     }
 
     const batchSteamAppPrices: Prisma.SteamAppPriceCreateManyInput[] = [];
@@ -63,26 +65,38 @@ export default async function UpdatePackPrices(
         countryCode,
         appIds,
         batchSteamAppPrices,
-        batchAppErrors
+        batchAppErrors,
       );
     }
 
-    await db.steamAppPrice.createMany({data: batchSteamAppPrices});
-
+    await db.steamAppPrice.createMany({ data: batchSteamAppPrices });
 
     if (batchAppErrors.length === 0) {
-        return response.status(200).json({ success: true, data: batchSteamAppPrices });
-      } else {
-        console.error("Error fetching one or more apps:", batchAppErrors);
-        return response.status(200).json({ success: true, data: batchSteamAppPrices, appErrors: batchAppErrors });
-      }
-    } catch (error) {
+      return response
+        .status(200)
+        .json({ success: true, data: batchSteamAppPrices });
+    } else {
+      console.error("Error fetching one or more apps:", batchAppErrors);
+      return response
+        .status(200)
+        .json({
+          success: true,
+          data: batchSteamAppPrices,
+          appErrors: batchAppErrors,
+        });
+    }
+  } catch (error) {
     console.error("Error fetching data:", error);
     return response.status(500).json({ error: "Failed to fetch data" });
   }
 }
 
-async function fetchSteamAppPrice(countryCode: string, appIds: string, steamAppPrices: Prisma.SteamAppPriceCreateManyInput[], appErrors: AppError[]) {
+async function fetchSteamAppPrice(
+  countryCode: string,
+  appIds: string,
+  steamAppPrices: Prisma.SteamAppPriceCreateManyInput[],
+  appErrors: AppError[],
+) {
   //name,price_overview,background,release_date
   const fetchUrl =
     env.STEAM_APP_DETAILS_URL +
@@ -106,7 +120,9 @@ async function fetchSteamAppPrice(countryCode: string, appIds: string, steamAppP
         app.success &&
         app.data.price_overview !== undefined
       ) {
-        let steamAppPrice = steamAppPrices.find((p) => p.steamAppId === app.appId);
+        let steamAppPrice = steamAppPrices.find(
+          (p) => p.steamAppId === app.appId,
+        );
         if (typeof steamAppPrice === "undefined") {
           steamAppPrice = {
             steamAppId: app.appId,
