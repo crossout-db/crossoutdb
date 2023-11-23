@@ -13,7 +13,7 @@ async function main() {
         recipeItem: await prisma.recipeItem.findMany({}),
         pack: await prisma.pack.findMany({}),
         packItem: await prisma.packItem.findMany({}),
-        steamAppPrice: await prisma.steamAppPrice.findMany({}),
+        packPrice: await prisma.packPrice.findMany({}),
         category: await prisma.category.findMany({}),
         faction: await prisma.faction.findMany({}),
         type: await prisma.type.findMany({}),
