@@ -1,132 +1,107 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
-import { Prisma } from "@prisma/client";
-import { CalcCraftingCosts } from "~/lib/CalcCraftingCost";
+import { Market, Prisma } from "@prisma/client";
+import {
+  CalcCraftingCosts,
+  ICalcCraftingCostsError,
+  IItemCrafting,
+  IRecipeCrafting,
+} from "~/lib/CalcCraftingCost";
+import { FetchCrossoutDBMarketPrices } from "./FetchCrossoutDBMarketPrices";
 
-interface MarketPriceAPI {
-  id: number;
-  name: string;
-  localizedName: null | string;
-  availableName: string;
-  description: null | string;
-  sellOffers: number;
-  sellPrice: number;
-  buyOrders: number;
-  buyPrice: number;
-  meta: number;
-  removed: number;
-  craftable: number;
-  popularity: number;
-  workbenchRarity: number;
-  craftingSellSum: number;
-  craftingBuySum: number;
-  amount: number;
-  demandSupplyRatio: number;
-  margin: number;
-  roi: number;
-  craftingMargin: number;
-  formatDemandSupplyRatio: string;
-  formatMargin: string;
-  formatRoi: string;
-  formatCraftingMargin: string;
-  craftVsBuy: string;
-  timestamp: Date;
-  lastUpdateTime: Date;
-  rarityId: number;
-  rarityName: string | null;
-  categoryId: number;
-  categoryName: string | null;
-  typeId: number;
-  recipeId: number;
-  typeName: string;
-  factionNumber: number;
-  faction: string | null;
-  formatBuyPrice: string;
-  formatSellPrice: string;
-  formatCraftingSellSum: string;
-  formatCraftingBuySum: string;
-  craftingResultAmount: number;
-  image: string;
-  imagePath: string;
-  sortedStats: string[] | null;
+interface IUpdateMarketPrices {
+  debug?: {
+    batchMarketPrices: Prisma.MarketCreateManyInput[];
+    recipeCraftCosts: IRecipeCrafting[];
+    itemCraftCosts: IItemCrafting[];
+  };
+  errors?: {
+    updateMarketPricesErrors: IUpdateMarketPricesError[];
+    calcCraftingCostsErrors: ICalcCraftingCostsError[];
+  };
 }
 
-interface Errors {
+interface IUpdateMarketPricesError {
   id: number;
   message: string;
 }
 
-export default async function UpdateMarketPrices(
-  request: NextApiRequest,
-  response: NextApiResponse,
-): Promise<void> {
-  const authHeader = request.headers.authorization;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     console.error("Failed authorization");
-    return response.status(401).json({ success: false });
+    return res
+      .status(401)
+      .json({ success: false, error: "Failed authorization" });
   }
   try {
-    const fetchUrl = env.CROSSOUT_MARKET_URL;
+    const data = await UpdateMarketPrices();
 
-    // console.log(`Fetching data from: ${fetchUrl}`);
-    const result = await fetch(fetchUrl);
-    const data: MarketPriceAPI[] = (await result.json()) as MarketPriceAPI[];
-    const errors: Errors[] = [];
-
-    const batchMarketPrices: Prisma.MarketCreateManyInput[] = [];
-    const items = await db.item.findMany({});
-
-    for (const marketPrice of data) {
-      const item = items.find((item) => item.id === marketPrice.id);
-      if (!item) {
-        errors.push({
-          id: marketPrice.id,
-          message: `Failed to find item with marketDef`,
-        });
-        continue;
-      }
-
-      batchMarketPrices.push({
-        itemId: item.id,
-        marketDef: item.marketDef ?? "",
-        sellPriceMin: marketPrice.sellPrice,
-        sellOrders: marketPrice.sellOffers,
-        buyPriceMax: marketPrice.buyPrice,
-        buyOrders: marketPrice.buyOrders,
-        timestamp: new Date(),
-      });
-    }
-
-    await db.market.createMany({ data: batchMarketPrices });
-    const {recipeCraftCosts, itemCraftCosts, itemPrices} =
-      await CalcCraftingCosts();
-
-    if (errors.length === 0) {
-      return response
-        .status(200)
-        .json({
-          success: true,
-          data: batchMarketPrices,
-          itemPrices: itemPrices,
-          recipes: recipeCraftCosts,
-          items: itemCraftCosts,
-        });
-    } else {
-      console.error("One or more errors:", errors);
-      return response
-        .status(200)
-        .json({
-          success: true,
-          data: batchMarketPrices,
-          itemPrices: itemPrices,
-          recipes: recipeCraftCosts,
-          items: itemCraftCosts,
-          errors: errors,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      debug: data.debug,
+      errors: data.errors,
+    });
   } catch (error) {
     console.error("Error fetching data:", error);
-    return response.status(500).json({ error: "Failed to fetch data" });
+    return res.status(500).json({ error: "Failed to fetch data" });
   }
+}
+
+export async function UpdateMarketPrices(): Promise<IUpdateMarketPrices> {
+  const marketPrices = await FetchCrossoutDBMarketPrices();
+  const batchMarketPrices: Prisma.MarketCreateManyInput[] = [];
+  const updateMarketPricesErrors: IUpdateMarketPricesError[] = [];
+
+  const items = await db.item.findMany({});
+
+  for (const marketPrice of marketPrices) {
+    const item = items.find((item) => item.oldId === marketPrice.id);
+    if (!item) {
+      // TODO: Add new market price item to DB
+      updateMarketPricesErrors.push({
+        id: marketPrice.id,
+        message: `Failed to find matching item`,
+      });
+      continue;
+    }
+
+    batchMarketPrices.push({
+      itemId: item.id,
+      marketDef: item.marketDef ?? "",
+      sellPriceMin: marketPrice.sellPrice,
+      sellOrders: marketPrice.sellOffers,
+      buyPriceMax: marketPrice.buyPrice,
+      buyOrders: marketPrice.buyOrders,
+      timestamp: new Date(),
+    });
+  }
+
+  await db.market.createMany({ data: batchMarketPrices });
+  
+  const {
+    recipeCraftCosts,
+    itemCraftCosts,
+    errors: calcCraftingCostsErrors,
+  } = await CalcCraftingCosts();
+
+  if (updateMarketPricesErrors?.length > 0) {
+    console.error("One or more errors:", updateMarketPricesErrors);
+  }
+
+  return {
+    debug: {
+      batchMarketPrices: batchMarketPrices,
+      recipeCraftCosts: recipeCraftCosts,
+      itemCraftCosts: itemCraftCosts,
+    },
+    errors: {
+      updateMarketPricesErrors: updateMarketPricesErrors,
+      calcCraftingCostsErrors: calcCraftingCostsErrors,
+    },
+  };
 }

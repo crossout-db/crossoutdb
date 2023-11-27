@@ -1,6 +1,6 @@
 import { db } from "~/server/db";
 
-export interface ItemCrafting {
+export interface IItemCrafting {
   itemId: number;
   itemName: string;
   itemQty: number;
@@ -13,16 +13,22 @@ export interface ItemCrafting {
   timestamp: Date | undefined;
 }
 
-export interface RecipeCrafting {
+export interface IRecipeCrafting {
   recipeId: number;
   resultItemId: number;
   resultItemName: string;
+  recipeQty: number;
   craftCost: number;
-  items: ItemCrafting[];
+  items: IItemCrafting[];
+}
+
+export interface ICalcCraftingCostsError {
+  recipeId: number;
+  message: string;
 }
 
 export async function CalcCraftingCosts() {
-  const itemPrices = await db.market.findMany({
+  const currentMarket = await db.market.findMany({
     where: {
       timestamp: {
         gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -52,104 +58,152 @@ export async function CalcCraftingCosts() {
     },
   });
 
-  const itemCraftCosts: ItemCrafting[] = [];
-  const recipeCraftCosts: RecipeCrafting[] = [];
+  const itemCraftCosts: IItemCrafting[] = [];
+  const recipeCraftCosts: IRecipeCrafting[] = [];
+  const errors: ICalcCraftingCostsError[] = [];
 
-  if (recipes) {
-    for (const recipe of recipes) {
-      const recipeResultItemId = recipe.itemId;
+  for (const recipe of recipes) {
+    const recipeResultItemId = recipe.itemId;
+    const recipeMessage = `Recipe ${recipe.id}|${recipe.item.name}`;
 
-      /**************************/
-      /**** Calc Recipe Cost ****/
-      /**************************/
-      let recipeCost = 0;
-      const recipeItems: ItemCrafting[] = [];
+    /**************************/
+    /**** Calc Recipe Cost ****/
+    /**************************/
+    let recipeCost = 0;
+    const recipeItems: IItemCrafting[] = [];
 
-      //TODO: See if reduce is faster
-      //const recipeCost = recipe.ingredients.reduce((totalCost, ingredient) => {
-      for (const ingredient of recipe.ingredients) {
-        const item = ingredient.item;
-        const itemPrice = itemPrices.find(
-          (i) => i.itemId === ingredient.itemId,
-        );
-        const sellPriceMin = itemPrice?.sellPriceMin ?? 0;
-        const itemCraftCost =
-          itemCraftCosts.find((i) => i.itemId === ingredient.itemId)
-            ?.craftCost ?? 0;
-        recipeItems.push({
-          itemId: item.id,
-          itemName: item.name,
-          itemQty: item.quantity,
-          recipeQty: ingredient.quantity,
-          sellPriceMin: sellPriceMin,
-          sellOrders: itemPrice?.sellOrders ?? 0,
-          buyPriceMax: itemPrice?.buyPriceMax ?? 0,
-          buyOrders: itemPrice?.buyOrders ?? 0,
-          craftCost: itemCraftCost,
-          timestamp: itemPrice?.timestamp,
-        });
-        if (
-          sellPriceMin == 0 ||
-          (itemCraftCost > 0 && itemCraftCost < sellPriceMin)
-        ) {
-          recipeCost += itemCraftCost * ingredient.quantity;
-        } else {
-          const pricePerItem = Math.round(sellPriceMin / item.quantity);
-          recipeCost += pricePerItem * ingredient.quantity;
+    //TODO: See if reduce is faster
+    //const recipeCost = recipe.ingredients.reduce((totalCost, ingredient) => {
+    for (const ingredient of recipe.ingredients) {
+      const item = ingredient.item;
+      const ingredientMessage = `Ingredient ${ingredient.itemId}|${item.name}`;
+
+      const itemPrice = currentMarket.find(
+        (i) => i.itemId === ingredient.itemId,
+      );
+      const sellPriceMin = itemPrice?.sellPriceMin ?? 0;
+      if (item.saleable) {
+        if (!itemPrice) {
+          console.warn(
+            `${recipeMessage} - ${ingredientMessage}: could not find an itemPrice`,
+          );
+          errors.push({
+            recipeId: recipe.id,
+            message: `${ingredientMessage}: could not find an itemPrice`,
+          });
+        }
+        if (sellPriceMin == 0 && item.saleable) {
+          console.warn(
+            `${recipeMessage} - ${ingredientMessage}: sellPriceMin = 0`,
+          );
+          errors.push({
+            recipeId: recipe.id,
+            message: `${ingredientMessage}: sellPriceMin = 0`,
+          });
         }
       }
+      const itemCraftCost =
+        itemCraftCosts.find((i) => i.itemId === ingredient.itemId)?.craftCost ??
+        0;
+      if (!itemCraftCost && item.categoryId !== 8) {
+        console.warn(
+          `${recipeMessage} - ${ingredientMessage}: could not find an itemCraftCost`,
+        );
+        errors.push({
+          recipeId: recipe.id,
+          message: `${ingredientMessage}: could not find an itemCraftCost`,
+        });
+      }
 
-      const recipeRecord: RecipeCrafting = {
-        recipeId: recipe.id,
-        resultItemId: recipe.itemId,
-        resultItemName: recipe.item.name,
-        craftCost: recipeCost,
-        items: recipeItems,
-      };
+      recipeItems.push({
+        itemId: item.id,
+        itemName: item.name,
+        itemQty: item.quantity,
+        recipeQty: ingredient.quantity,
+        sellPriceMin: sellPriceMin,
+        sellOrders: itemPrice?.sellOrders ?? 0,
+        buyPriceMax: itemPrice?.buyPriceMax ?? 0,
+        buyOrders: itemPrice?.buyOrders ?? 0,
+        craftCost: itemCraftCost,
+        timestamp: itemPrice?.timestamp,
+      });
 
-      /**************************/
+      let pricePerItem = Math.round(sellPriceMin / item.quantity);
+      if (
+        itemCraftCost > 0 &&
+        (itemCraftCost < sellPriceMin || sellPriceMin == 0)
+      ) {
+        pricePerItem = itemCraftCost;
+      }
 
-      recipeCraftCosts.push(recipeRecord);
+      recipeCost += pricePerItem * ingredient.quantity;
+    }
 
-      const itemCraftCost = itemCraftCosts.find(
+    const recipeRecord: IRecipeCrafting = {
+      recipeId: recipe.id,
+      resultItemId: recipe.itemId,
+      resultItemName: recipe.item.name,
+      recipeQty: recipe.quantity,
+      craftCost: recipeCost,
+      items: recipeItems,
+    };
+
+    /**************************/
+
+    recipeCraftCosts.push(recipeRecord);
+
+    const recipeCostPerItem = Math.round(
+      recipeRecord.craftCost / recipe.quantity,
+    );
+    if (recipeCostPerItem == 0) {
+      console.warn(`${recipeMessage}: recipeCostPerItem == 0`);
+      errors.push({ recipeId: recipe.id, message: `recipeCostPerItem == 0` });
+    }
+
+    const itemCraftCost = itemCraftCosts.find(
+      (i) => i.itemId === recipeResultItemId,
+    );
+    if (itemCraftCost) {
+      if (
+        recipeCostPerItem > 0 &&
+        recipeCostPerItem < itemCraftCost.craftCost
+      ) {
+        itemCraftCost.craftCost = recipeCostPerItem;
+      }
+    } else {
+      const itemPrice = currentMarket?.find(
         (i) => i.itemId === recipeResultItemId,
       );
-      console.warn(`Item ${recipeResultItemId} not found in itemCraftCosts`);
-
-      const newItemCost = Math.round(recipeRecord.craftCost / recipe.quantity);
-      if (itemCraftCost) {
-        if (newItemCost > 0 && newItemCost < itemCraftCost.craftCost) {
-          itemCraftCost.craftCost = newItemCost;
-        }
-      } else {
-        const itemPrice = itemPrices?.find(
-          (i) => i.itemId === recipeResultItemId,
-        );
-        console.warn(`Item ${recipeResultItemId} not found in itemPrices`);
-
-        itemCraftCosts.push({
-          itemId: recipeResultItemId,
-          itemName: recipe.item.name,
-          itemQty: recipe.item.quantity,
-          recipeQty: recipe.quantity,
-          sellPriceMin: itemPrice?.sellPriceMin ?? 0,
-          sellOrders: itemPrice?.sellOrders ?? 0,
-          buyPriceMax: itemPrice?.buyPriceMax ?? 0,
-          buyOrders: itemPrice?.buyOrders ?? 0,
-          craftCost: newItemCost,
-          timestamp: itemPrice?.timestamp,
+      if (!itemPrice && recipe.item.saleable) {
+        console.warn(`${recipeMessage}: could not find result itemPrice`);
+        errors.push({
+          recipeId: recipe.id,
+          message: `could not find result itemPrice`,
         });
       }
+
+      itemCraftCosts.push({
+        itemId: recipeResultItemId,
+        itemName: recipe.item.name,
+        itemQty: recipe.item.quantity,
+        recipeQty: recipe.quantity,
+        sellPriceMin: itemPrice?.sellPriceMin ?? 0,
+        sellOrders: itemPrice?.sellOrders ?? 0,
+        buyPriceMax: itemPrice?.buyPriceMax ?? 0,
+        buyOrders: itemPrice?.buyOrders ?? 0,
+        craftCost: recipeCostPerItem,
+        timestamp: itemPrice?.timestamp,
+      });
     }
   }
 
   await UpdateRecipeCraftingCosts(recipeCraftCosts);
   await UpdateItemCraftingCosts(itemCraftCosts);
 
-  return { recipeCraftCosts, itemCraftCosts, itemPrices };
+  return { recipeCraftCosts, itemCraftCosts, errors };
 }
 
-async function UpdateRecipeCraftingCosts(recipeCraftCosts: RecipeCrafting[]) {
+async function UpdateRecipeCraftingCosts(recipeCraftCosts: IRecipeCrafting[]) {
   for (const recipeCraftCost of recipeCraftCosts) {
     await db.recipe.update({
       where: {
@@ -163,7 +217,7 @@ async function UpdateRecipeCraftingCosts(recipeCraftCosts: RecipeCrafting[]) {
   }
 }
 
-async function UpdateItemCraftingCosts(itemCraftCosts: ItemCrafting[]) {
+async function UpdateItemCraftingCosts(itemCraftCosts: IItemCrafting[]) {
   for (const itemCraftCost of itemCraftCosts) {
     await db.item.update({
       where: {

@@ -1,23 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~/env.mjs";
-import { db } from "~/server/db";
-import { Prisma } from "@prisma/client";
+import { type Pack, type Prisma } from "@prisma/client";
+import { type IFetchAppError } from "./UpdatePackPrices";
 
-export interface AppDetailsPriceOverview {
-  apps: App[];
+export interface IAppDetailsPriceOverview {
+  apps: IApp[];
 }
 
-export interface App {
+export interface IApp {
   appId: string;
   success: boolean;
-  data: Data;
+  data: IData;
 }
 
-export interface Data {
-  price_overview: PriceOverview;
+export interface IData {
+  price_overview: IPriceOverview;
 }
 
-export interface PriceOverview {
+export interface IPriceOverview {
   currency: string;
   initial: number;
   final: number;
@@ -26,92 +26,55 @@ export interface PriceOverview {
   final_formatted: string;
 }
 
-export interface AppError {
-  appId: string;
-  countryCode: string[];
-  data?: string;
-}
+// countryCodes = ["us", "de", "uk", "ru"]
+// appIds = "759590,783870,764460,806120,809740,708490,853170,719670,708500,878630,643740,812760,887050,893760,960290,1034510,1034511,1049120,1049121,1059100,1076740,1076741,1141790,1158240,1158241,1192400,1193840,1015950,1254240,1276340,1356210,1356211,1437610,1437611,1475680,1558690,1558691,1563120,1584790,1585870,1598850,1585871,1637471,1637470,1637472,1637530,2126140,2620890,2620910,2620900,2470520,1894060,1946901,1792900,1953610,1968801,1946903"
 
-export default async function UpdatePackPrices(
-  request: NextApiRequest,
-  response: NextApiResponse,
-): Promise<void> {
-  const authHeader = request.headers.authorization;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     console.error("Failed authorization");
-    return response.status(401).json({ success: false });
+    return res
+      .status(401)
+      .json({ success: false, error: "Failed authorization" });
   }
   try {
-    const countryCodes = ["us", "de", "uk", "ru"];
-    const packs = await db.pack.findMany({});
-    const appIds = packs?.map((pack) => Number(pack.steamKey)).join(",");
-
-    // const appIds = "759590,783870,764460,806120,809740,708490,853170,719670,708500,878630,643740,812760,887050,893760,960290,1034510,1034511,1049120,1049121,1059100,1076740,1076741,1141790,1158240,1,1158241,1192400,1193840,2,1015950,1254240,1276340,1356210,1356211,1437610,1437611,1475680,1558690,1558691,1563120,1584790,1585870,1598850,1585871,1637471,1637470,1637472,1637530"
-
-    if (typeof appIds === "undefined" || appIds === "") {
-      console.error("Failed to fetch a list of steam appIds");
-      return response
-        .status(500)
-        .json({ error: "Failed to fetch a list of steam appIds" });
+    if (!req.query.countryCode || !req.query.appIds) {
+      console.error("Missing query parameters");
+      return res.status(400).json({ error: "Missing query parameters" });
     }
 
-    const batchPackPrices: Prisma.PackPriceCreateManyInput[] = [];
-    const batchAppErrors: AppError[] = [];
+    const data = await FetchSteamApps(
+      req.query.countryCode as string,
+      req.query.appIds as string,
+    );
 
-    for (const countryCode of countryCodes) {
-      await fetchPackPrice(
-        countryCode,
-        appIds,
-        batchPackPrices,
-        batchAppErrors,
-      );
-    }
-
-    for (const packPrice of batchPackPrices) {
-      const pack = packs.find((p) => p.steamKey === packPrice.key);
-      if (typeof pack !== "undefined") {
-        packPrice.packId = pack.id;
-      } else {
-        console.error(
-          `Failed to find pack for steamKey: ${packPrice.key}`,
-        );
-      }
-    }
-
-    await db.packPrice.createMany({ data: batchPackPrices });
-
-    if (batchAppErrors.length === 0) {
-      return response
-        .status(200)
-        .json({ success: true, data: batchPackPrices });
-    } else {
-      console.error("Error fetching one or more apps:", batchAppErrors);
-      return response
-        .status(200)
-        .json({
-          success: true,
-          data: batchPackPrices,
-          appErrors: batchAppErrors,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      data: data.appPrices,
+      errors: data.errors,
+    });
   } catch (error) {
     console.error("Error fetching data:", error);
-    return response.status(500).json({ error: "Failed to fetch data" });
+    return res.status(500).json({ error: "Failed to fetch data" });
   }
 }
 
-async function fetchPackPrice(
+export async function FetchSteamApps(
   countryCode: string,
   appIds: string,
-  packPrices: Prisma.PackPriceCreateManyInput[],
-  appErrors: AppError[],
+  packs?: Pack[],
 ) {
-  //name,price_overview,background,release_date
+  const appPrices: Prisma.PackPriceCreateManyInput[] = [];
+  const errors: IFetchAppError[] = [];
+  //Additional filters: name,price_overview,background,release_date
   const fetchUrl =
     env.STEAM_APP_DETAILS_URL +
-    `?appids=${appIds}&cc=${countryCode}&filters=price_overview`;
+    `?filters=price_overview&cc=${countryCode}&appids=${appIds}`;
 
-  // console.log(`Fetching data from: ${fetchUrl}`);
+  console.log(`Fetching data from: ${fetchUrl}`);
   const result = await fetch(fetchUrl);
   const data = await result.text();
 
@@ -121,7 +84,7 @@ async function fetchPackPrice(
     reformatted = reformatted.replace(/"(\d+)":{/g, '{"appId":$1,');
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const json: AppDetailsPriceOverview = JSON.parse(reformatted);
+    const json: IAppDetailsPriceOverview = JSON.parse(reformatted);
 
     for (const app of json.apps) {
       if (
@@ -129,46 +92,37 @@ async function fetchPackPrice(
         app.success &&
         app.data.price_overview !== undefined
       ) {
-        let packPrice = packPrices.find(
-          (p) => p.key === app.appId,
-        );
-        if (typeof packPrice === "undefined") {
-          packPrice = {
-            source: "STEAM",
-            //TODO: Why do I have to surround this with quotes?
-            key: `${app.appId}`,
-            packId: 0,
-            currencyCode: countryCode,
-            price: 0,
-            priceOriginal: null,
-            discount: null,
-            timestamp: new Date(),
-          };
-          packPrices.push(packPrice);
-        }
-
-        packPrice.price = app.data.price_overview.final;
-        packPrice.discount = app.data.price_overview.discount_percent;
-
+        const pack = packs?.find((p) => p.steamKey === app.appId.toString());
+        const packPrice: Prisma.PackPriceCreateManyInput = {
+          source: "STEAM",
+          //TODO: Why do I have to surround this with quotes?
+          key: `${app.appId}`,
+          packId: pack?.id ?? 0,
+          currencyCode: app.data.price_overview.currency,
+          price: app.data.price_overview.final,
+          priceOriginal: app.data.price_overview.initial,
+          discount: app.data.price_overview.discount_percent,
+          timestamp: new Date(),
+        };
+        appPrices.push(packPrice);
       } else {
-        let appError = appErrors.find((e) => e.appId === app.appId);
-        if (typeof appError === "undefined") {
-          appError = {
-            appId: app.appId,
-            countryCode: [],
-          };
-          appErrors.push(appError);
-        }
-        appError.countryCode.push(countryCode);
+        const appError: IFetchAppError = {
+          appId: app.appId,
+          data: JSON.stringify(app.data),
+        };
+        console.error(`Failed to fetch app: ${app.appId}`);
+        errors.push(appError);
       }
     }
+    return { appPrices, errors };
   } else {
-    const appError: AppError = {
-      appId: "",
-      countryCode: [],
-      data: data,
-    };
-    appError.countryCode.push(countryCode);
-    appErrors.push(appError);
+    const appError: IFetchAppError = {
+        appId: "",
+        data,
+      };
+      console.error(`Failed to fetch data`);
+      errors.push(appError);
+
+    return { errors };
   }
 }

@@ -21,6 +21,7 @@ import {
   type Translation,
   type Type,
   type User,
+  Prisma,
 } from "@prisma/client";
 import fs from "fs";
 
@@ -70,24 +71,28 @@ async function main() {
     await prisma.release.createMany({
       data: seedData.release,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Release_id_seq"', (SELECT MAX(id) FROM public."Release"));`)
   }
   if (seedData.category && (process.argv[2] === "category" || process.argv[2] === "all")) {
     console.log("Seeding category");
     await prisma.category.createMany({
       data: seedData.category,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Category_id_seq"', (SELECT MAX(id) FROM public."Category"));`)
   }
   if (seedData.faction && (process.argv[2] === "faction" || process.argv[2] === "all")) {
     console.log("Seeding faction");
     await prisma.faction.createMany({
       data: seedData.faction,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Faction_id_seq"', (SELECT MAX(id) FROM public."Faction"));`)
   }
   if (seedData.type && (process.argv[2] === "type" || process.argv[2] === "all")) {
     console.log("Seeding type");
     await prisma.type.createMany({
       data: seedData.type,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Type_id_seq"', (SELECT MAX(id) FROM public."Type"));`)
   }
   if (seedData.rarity && (process.argv[2] === "rarity" || process.argv[2] === "all")) {
     console.log("Seeding rarity");
@@ -100,48 +105,56 @@ async function main() {
     await prisma.item.createMany({
       data: seedData.item,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Item_id_seq"', (SELECT MAX(id) FROM public."Item"));`)
   }
   if (seedData.itemStats && (process.argv[2] === "itemStats" || process.argv[2] === "all")) {
     console.log("Seeding itemStats");
     await prisma.itemStats.createMany({
       data: seedData.itemStats,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"ItemStats_id_seq"', (SELECT MAX(id) FROM public."ItemStats"));`)
   }
   if (seedData.recipe && (process.argv[2] === "recipe" || process.argv[2] === "all")) {
     console.log("Seeding recipe");
     await prisma.recipe.createMany({
       data: seedData.recipe,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Recipe_id_seq"', (SELECT MAX(id) FROM public."Recipe"));`)
   }
   if (seedData.recipeItem && (process.argv[2] === "recipeItem" || process.argv[2] === "all")) {
     console.log("Seeding recipeItem");
     await prisma.recipeItem.createMany({
       data: seedData.recipeItem,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"RecipeItem_id_seq"', (SELECT MAX(id) FROM public."RecipeItem"));`)
   }
   if (seedData.pack && (process.argv[2] === "pack" || process.argv[2] === "all")) {
     console.log("Seeding pack");
     await prisma.pack.createMany({
       data: seedData.pack,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Pack_id_seq"', (SELECT MAX(id) FROM public."Pack"));`)
   }
   if (seedData.packItem && (process.argv[2] === "packItem" || process.argv[2] === "all")) {
     console.log("Seeding packItem");
     await prisma.packItem.createMany({
       data: seedData.packItem,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"PackItem_id_seq"', (SELECT MAX(id) FROM public."PackItem"));`)
   }
   if (seedData.packPrice && (process.argv[2] === "packPrice" || process.argv[2] === "all")) {
     console.log("Seeding packPrice");
     await prisma.packPrice.createMany({
       data: seedData.packPrice,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"PackPrice_id_seq"', (SELECT MAX(id) FROM public."PackPrice"));`)
   }
   if (seedData.synergy && (process.argv[2] === "synergy" || process.argv[2] === "all")) {
     console.log("Seeding synergy");
     await prisma.synergy.createMany({
       data: seedData.synergy,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Synergy_id_seq"', (SELECT MAX(id) FROM public."Synergy"));`)
   }
   if (seedData.synergyItem && (process.argv[2] === "synergyItem" || process.argv[2] === "all")) {
     console.log("Seeding synergyItem");
@@ -154,12 +167,14 @@ async function main() {
     await prisma.market.createMany({
       data: seedData.market,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Market_id_seq"', (SELECT MAX(id) FROM public."Market"));`)
   }
   if (seedData.badgeExchange && (process.argv[2] === "badgeExchange" || process.argv[2] === "all")) {
     console.log("Seeding badgeExchange");
     await prisma.badgeExchange.createMany({
       data: seedData.badgeExchange,
     });
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"BadgeExchange_id_seq"', (SELECT MAX(id) FROM public."BadgeExchange"));`)
   }
   if (seedData.country && (process.argv[2] === "country" || process.argv[2] === "all")) {
     console.log("Seeding country");
@@ -176,6 +191,7 @@ async function main() {
   if (seedData.translation && (process.argv[2] === "translation" || process.argv[2] === "all")) {
     console.log("Seeding translation");
     await updateTranslations(seedData.translation);
+    await prisma.$queryRaw(Prisma.sql`SELECT SETVAL('"Translation_id_seq"', (SELECT MAX(id) FROM public."Translation"));`)
   }
   // if (seedData.log && (process.argv[2] === "log" || process.argv[2] === "all")) {
   //   console.log("Seeding log");
