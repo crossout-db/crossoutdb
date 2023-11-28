@@ -112,75 +112,14 @@ export type ItemFindUniqueOutput = Prisma.ItemGetPayload<{
   include: typeof itemInclude,
 }>;
 
-function findUniqueItem(item_id: number) {
+export default function ItemPage() {
+  const router = useRouter();
+  const item_id = parseInt(router.query.id as string, 10);
   const { data } = trpc.item.findUnique.useQuery({
     where: { id: item_id },
     include: itemInclude,
   });
 
-  return data;
-}
-
-export default function ItemPage() {
-  const router = useRouter();
-  const item_id = parseInt(router.query.id as string, 10);
-  const data = findUniqueItem(item_id);
-  // const { data } = trpc.item.findUnique.useQuery({
-  //   where: { id: item_id },
-  //   include: {
-  //     type: true,
-  //     category: true,
-  //     faction: true,
-  //     rarity: true,
-  //     itemStats: {
-  //       orderBy: {
-  //         timestamp: "desc",
-  //       },
-  //       take: 1,
-  //       include: {
-  //         user: {
-  //           select: {
-  //             name: true,
-  //           },
-  //         },
-  //         release: true,
-  //       },
-  //     },
-  //     recipes: {
-  //       include: {
-  //         ingredients: {
-  //           include: {
-  //             item: createRecipeTree(3),
-  //           },
-  //         },
-  //       },
-  //     },
-  //     market: {
-  //       orderBy: {
-  //         timestamp: "desc",
-  //       },
-  //       take: 1,
-  //     },
-  //     itemSynergies: {
-  //       include: {
-  //         synergy: {
-  //           include: {
-  //             synergyItems: {
-  //               include: {
-  //                 item: {
-  //                   include: {
-  //                     rarity: true,
-  //                     category: true,
-  //                   },
-  //                 },
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  // });
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 

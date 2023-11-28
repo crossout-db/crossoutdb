@@ -14,44 +14,36 @@ type Props = {
 };
 
 const itemInclude = Prisma.validator<Prisma.ItemInclude>()({
-    translations: true,
-    type: {
-      include: { translations: true },
+  translations: true,
+  type: {
+    include: { translations: true },
+  },
+  category: {
+    include: { translations: true },
+  },
+  faction: true,
+  rarity: true,
+  market: {
+    orderBy: {
+      timestamp: "desc",
     },
-    category: {
-      include: { translations: true },
-    },
-    faction: true,
-    rarity: true,
-    market: {
-      orderBy: {
-        timestamp: "desc",
-      },
-      take: 1,
-    },
+    take: 1,
+  },
 });
 
 export type ItemFindManyWithMarketOutput = Prisma.ItemGetPayload<{
   include: typeof itemInclude,
 }>;
 
-function findManyItem() {
-  const { data } = trpc.item.findMany.useQuery({
-    where: {
-      saleable: true,
-    },
-    include: itemInclude,
-  });
-
-  return data;
-}
-
 const Market: NextPage = () => {
   const currentUser = useCurrentUser();
   const router = useRouter();
   const { status } = useSession();
-  const data = findManyItem();
   const { t } = useTranslation();
+
+  const { data } = trpc.item.findMany.useQuery({
+    include: itemInclude,
+  });
 
   if (!data) {
     return <div className="block overflow-auto">{t("loading")}</div>;
@@ -83,11 +75,7 @@ const Market: NextPage = () => {
   };
 
   return (
-    <MarketTable
-      data={data}
-      categories={categories}
-      rarities={rarities}
-    />
+    <MarketTable data={data} categories={categories} rarities={rarities} />
   );
 };
 
