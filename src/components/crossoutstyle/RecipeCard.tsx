@@ -46,7 +46,7 @@ const mapRecipesRecursive = (item: ItemFindUniqueOutput, recipePath: string): Re
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
-    const { t } = useTranslation(['model']);
+    const { t } = useTranslation();
     if (!data)
         return <></>
 
@@ -59,7 +59,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
 
     return <div className="text-white space-y-2">
         <div className="p-4 flex flex-row items-baseline bg-neutral-800 space-x-4">
-            <h1 className="text-2xl">{t("model:recipe")}</h1>
+            <h1 className="text-2xl">{t("fields.recipe")}</h1>
             <PrimaryButton onClick={() => setRecipeState(recipeState.map(x => ({ ...x, active: true })))}>Expand all</PrimaryButton>
             <PrimaryButton onClick={() => setRecipeState(recipeState.map(x => ({ ...x, active: false })))}>Collapse all</PrimaryButton>
         </div>

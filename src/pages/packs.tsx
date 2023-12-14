@@ -11,17 +11,21 @@ type Props = {
 };
 
 const packInclude = Prisma.validator<Prisma.PackInclude>()({
-    items: {
-      include: {
-        item: true,
+  items: {
+    include: {
+      item: {
+        include: {
+          translations: true,
+        },
       },
     },
-    packPrices: {
-      orderBy: {
-        timestamp: "desc",
-      },
-      take: 1,
+  },
+  packPrices: {
+    orderBy: {
+      timestamp: "desc",
     },
+    take: 1,
+  },
 });
 export type PackFindManyOutput = Prisma.PackGetPayload<{
   include: typeof packInclude,
@@ -59,11 +63,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerSideTranslations(locale ?? "en", [
-      "common",
-      "model",
-      "db",
-    ])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common"])),
   },
 });
 

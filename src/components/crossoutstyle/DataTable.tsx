@@ -65,7 +65,7 @@ const CategoryFilter = ({
 }) => {
     const [categories, setCategories] = useState<number[]>([0]);
 
-    const { t } = useTranslation(['model']);
+    const { t } = useTranslation();
     if (!data) return <></>;
 
     const size = 42;
@@ -119,7 +119,7 @@ const CategoryFilter = ({
     ];
     return (
         <div className="inline-flex flex-col space-y-0.5">
-            <span className="text-white">{t("model:category")}</span>
+            <span className="text-white">{t("fields.category")}</span>
             <div className="inline">
                 <div className="inline space-x-1">{buttons}</div>
             </div>
@@ -136,7 +136,7 @@ const RarityFilter = ({
 }) => {
     const [rarities, setRarities] = useState<number[]>([]);
 
-    const { t } = useTranslation(['model']);
+    const { t } = useTranslation();
     if (!data) return <></>;
 
     const handleClick = (rarity: number) => {
@@ -173,7 +173,7 @@ const RarityFilter = ({
 
     return (
         <div className="inline-flex flex-col space-y-0.5">
-            <span className="text-white">{t("model:rarity")}</span>
+            <span className="text-white">{t("fields.rarity")}</span>
             <div className="inline">
                 <div className="inline space-x-1">{buttons}</div>
             </div>

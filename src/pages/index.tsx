@@ -42,6 +42,9 @@ const Market: NextPage = () => {
   const { t } = useTranslation();
 
   const { data } = trpc.item.findMany.useQuery({
+    where: {
+        active: true,
+    },
     include: itemInclude,
   });
 
@@ -83,7 +86,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerSideTranslations(locale ?? "en", ["common", "model"])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common"])),
   },
 });
 

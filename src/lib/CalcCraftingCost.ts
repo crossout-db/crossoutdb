@@ -197,40 +197,6 @@ export async function CalcCraftingCosts() {
     }
   }
 
-  await UpdateRecipeCraftingCosts(recipeCraftCosts);
-  await UpdateItemCraftingCosts(itemCraftCosts);
-
   return { recipeCraftCosts, itemCraftCosts, errors };
 }
 
-async function UpdateRecipeCraftingCosts(recipeCraftCosts: IRecipeCrafting[]) {
-  for (const recipeCraftCost of recipeCraftCosts) {
-    await db.recipe.update({
-      where: {
-        id: recipeCraftCost.recipeId,
-      },
-      data: {
-        craftCost: recipeCraftCost.craftCost,
-        timestamp: new Date(),
-      },
-    });
-  }
-}
-
-async function UpdateItemCraftingCosts(itemCraftCosts: IItemCrafting[]) {
-  for (const itemCraftCost of itemCraftCosts) {
-    await db.item.update({
-      where: {
-        id: itemCraftCost.itemId,
-      },
-      data: {
-        sellPriceMin: itemCraftCost.sellPriceMin,
-        sellOrders: itemCraftCost.sellOrders,
-        buyPriceMax: itemCraftCost.buyPriceMax,
-        buyOrders: itemCraftCost.buyOrders,
-        craftCost: itemCraftCost.craftCost,
-        timestamp: itemCraftCost.timestamp,
-      },
-    });
-  }
-}

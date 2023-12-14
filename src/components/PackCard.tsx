@@ -13,7 +13,8 @@ interface PackProps {
 }
 
 const PackCard: React.FC<PackProps> = ({ pack }) => {
-  const { t } = useTranslation(["db"]);
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   let sellTotal = 0;
   let buyTotal = 0;
 
@@ -37,38 +38,45 @@ const PackCard: React.FC<PackProps> = ({ pack }) => {
       </Link>
       <div className="flex w-full flex-row">
         <ul>
-          {pack.items.map((packItem) => (
-            <div
-              key={packItem.item.id}
-              className="col-xs-3 col-sm-3 col-md-3 col-lg-2"
-            >
-              <Item
-                id={packItem.item.id}
-                name={t(`db:${packItem.item.name}`)}
-                rarityId={packItem.item.rarityId}
-                size="small"
-              />
-              <Price value={packItem.item.sellPriceMin ?? 0} />
-              <Price value={packItem.item.buyPriceMax ?? 0} />
-            </div>
-          ))}
+          {pack.items.map((packItem) => {
+            const item = packItem.item;
+            sellTotal += item.sellPriceMin ?? 0;
+            buyTotal += item.buyPriceMax ?? 0;
+            return (
+              <li key={item.id}>
+                <div
+                  key={item.id}
+                  className="col-xs-3 col-sm-3 col-md-3 col-lg-2"
+                ></div>
+                <Item
+                  id={item.id}
+                  name={
+                    item.translations.find((tf) => tf.languageCode === lang)
+                      ?.value ?? item.name
+                  }
+                  rarityId={item.rarityId}
+                  size="small"
+                />
+                <Price value={item.sellPriceMin ?? 0} />
+                <Price value={item.buyPriceMax ?? 0} />
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div className="flex w-full flex-row">
         <div className="flex flex-col">Item Sum:</div>
         <div className="flex flex-col">
-          <h2 className="card-title">Sell Total: {sellTotal}</h2>
+          <h2 className="card-title">Sell Total: <Price value={sellTotal ?? 0} /></h2>
         </div>
         <div className="flex flex-col">
-          <h2 className="card-title">Buy Total: {buyTotal}</h2>
+          <h2 className="card-title">Buy Total: <Price value={buyTotal ?? 0} /></h2>
         </div>
       </div>
       <div className="flex w-full flex-row">
         <div className="flex flex-col">Steam Price:</div>
         <div className="flex flex-col">
-          <h2 className="card-title">
-            {pack.packPrices[0]?.price ?? 0}
-          </h2>
+          <h2 className="card-title">{pack.packPrices[0]?.price ?? 0}</h2>
         </div>
         <div className="flex flex-col">
           <h2 className="card-title">

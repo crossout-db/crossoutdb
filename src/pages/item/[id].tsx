@@ -149,14 +149,14 @@ export default function ItemPage() {
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.category.translations.find((tf) => tf.languageCode === lang)?.value ?? data?.category.name}
+              {t(`db.category.${data?.category.name}`) ?? data?.category.name}
             </span>
             <span
               className={
                 "rounded-lg bg-neutral-800 px-2 py-0.5 font-bold text-white"
               }
             >
-              {data?.type.translations.find((tf) => tf.languageCode === lang)?.value ?? data?.type.name}
+              {t(`db.type.${data?.type.name}`) ?? data?.type.name}
             </span>
             <span
               className={
@@ -193,6 +193,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   locale,
 }) => ({
   props: {
-    ...(await getServerSideTranslations(locale ?? "en", ["common", "model"])),
+    ...(await getServerSideTranslations(locale ?? "en", ["common"])),
   },
 });

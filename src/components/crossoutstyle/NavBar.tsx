@@ -25,28 +25,28 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
 
   const links = [
     {
-      name: t("navbar.packs"),
+      name: t("pages.navbar.packs"),
       href: "/packs",
     },
   ];
 
   const userLinks = [
     {
-      name: t("navbar.user.profile"),
+      name: t("pages.navbar.user.profile"),
       href: "/profile",
     },
     {
-      name: t("navbar.user.settings"),
+      name: t("pages.navbar.user.settings"),
       href: "/settings",
     },
     {
-      name: t("navbar.user.signOut"),
+      name: t("pages.navbar.user.signOut"),
       onClick: () => void signOut(),
     },
   ];
 
   if (currentUser?.role === "ADMIN")
-    userLinks.splice(-1, 0, { name: t("navbar.user.adminPage"), href: "/admin" });
+    userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
 
   return (
     <nav className="bg-neutral-800 drop-shadow">
@@ -78,7 +78,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
                 void router.push(router.pathname, router.asPath, {
                   locale: i18n.language === "en" ? "ru" : "en",
                 })
-              }>{t("navbar.language")}</button>
+              }>{t("pages.navbar.language")}</button>
         </div>
         <div className="flex flex-row space-x-2">
           <div>
@@ -117,7 +117,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
                 className="border-xoPrimary text-xoPrimary flex items-center border bg-black px-3 py-2 hover:border-white"
                 onClick={() => void signIn()}
               >
-                {t("navbar.user.signIn")}
+                {t("pages.navbar.user.signIn")}
               </button>
             )}
           </div>

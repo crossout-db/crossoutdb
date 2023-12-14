@@ -82,7 +82,7 @@ export async function UpdateMarketPrices(): Promise<IUpdateMarketPrices> {
   }
 
   await db.market.createMany({ data: batchMarketPrices });
-  
+
   const {
     recipeCraftCosts,
     itemCraftCosts,
@@ -92,6 +92,9 @@ export async function UpdateMarketPrices(): Promise<IUpdateMarketPrices> {
   if (updateMarketPricesErrors?.length > 0) {
     console.error("One or more errors:", updateMarketPricesErrors);
   }
+
+  await UpdateRecipeCraftingCosts(recipeCraftCosts);
+  await UpdateItemCraftingCosts(batchMarketPrices, itemCraftCosts);
 
   return {
     debug: {
@@ -104,4 +107,42 @@ export async function UpdateMarketPrices(): Promise<IUpdateMarketPrices> {
       calcCraftingCostsErrors: calcCraftingCostsErrors,
     },
   };
+}
+
+async function UpdateRecipeCraftingCosts(recipeCraftCosts: IRecipeCrafting[]) {
+  for (const recipeCraftCost of recipeCraftCosts) {
+    await db.recipe.update({
+      where: {
+        id: recipeCraftCost.recipeId,
+      },
+      data: {
+        craftCost: recipeCraftCost.craftCost,
+        timestamp: new Date(),
+      },
+    });
+  }
+}
+
+async function UpdateItemCraftingCosts(
+  batchMarketPrices: Prisma.MarketCreateManyInput[],
+  itemCraftCosts: IItemCrafting[],
+) {
+  for (const batchMarketPrice of batchMarketPrices) {
+    const craftCost = itemCraftCosts.find(
+      (item) => item.itemId === batchMarketPrice.itemId,
+    )?.craftCost;
+    await db.item.update({
+      where: {
+        marketDef: batchMarketPrice.marketDef,
+      },
+      data: {
+        sellPriceMin: batchMarketPrice.sellPriceMin,
+        sellOrders: batchMarketPrice.sellOrders,
+        buyPriceMax: batchMarketPrice.buyPriceMax,
+        buyOrders: batchMarketPrice.buyOrders,
+        craftCost: craftCost,
+        timestamp: batchMarketPrice.timestamp,
+      },
+    });
+  }
 }

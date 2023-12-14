@@ -45,7 +45,7 @@ interface RecipeProps {
 
 const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   if (!item) return <></>;
-  const { t, i18n } = useTranslation(['common','model']);
+  const { t, i18n } = useTranslation();
   const lang = i18n.language;
   
   const recipeContext = useContext(RecipeContext);

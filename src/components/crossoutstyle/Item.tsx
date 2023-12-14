@@ -12,7 +12,7 @@ interface ItemProps {
     size: 'small' | 'medium' | 'large';
 }
 
-const Button: React.FC<ItemProps> = ({ id, name, type, rarityId, size }) => {
+const Item: React.FC<ItemProps> = ({ id, name, type, rarityId, size }) => {
     let edge = 0;
     switch (size) {
         case 'small':
@@ -63,4 +63,4 @@ const Button: React.FC<ItemProps> = ({ id, name, type, rarityId, size }) => {
     );
 };
 
-export default Button;
+export default Item;

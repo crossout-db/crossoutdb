@@ -12,50 +12,50 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
 
     dayjs.extend(relativeTime);
 
-    const { t } = useTranslation(['common','model']);
+    const { t } = useTranslation();
     const stats = data?.itemStats[0];
 
     const ratings = [
-        { label: t("model:itemModel.cabinPower"), value: stats?.cabinPower },
-        { label: t("model:itemModel.damage"), value: stats?.damage },
-        { label: t("model:itemModel.fireRate"), value: stats?.fireRate },
-        { label: t("model:itemModel.range"), value: stats?.range },
-        { label: t("model:itemModel.accuracy"), value: stats?.accuracy },
-        { label: t("model:itemModel.blastPower"), value: stats?.blastPower },
+        { label: t("fields.cabinPower"), value: stats?.cabinPower },
+        { label: t("fields.damage"), value: stats?.damage },
+        { label: t("fields.fireRate"), value: stats?.fireRate },
+        { label: t("fields.range"), value: stats?.range },
+        { label: t("fields.accuracy"), value: stats?.accuracy },
+        { label: t("fields.blastPower"), value: stats?.blastPower },
     ].filter((x): x is { label: string, value: number } => !!x.value);
 
     const performanceStats = [
-        { label: t("model:itemModel.maxCabinSpeed"), prefix: '', value: stats?.maxCabinSpeed, suffix: ' km/h' },
-        { label: t("model:itemModel.maxChassisSpeed"), prefix: '', value: stats?.maxChassisSpeed, suffix: ' km/h' },
-        { label: t("model:itemModel.tonnage"), prefix: '+', value: stats?.tonnage, suffix: ' kg' },
-        { label: t("model:itemModel.featureBulletPercent"), prefix: '', value: stats?.featureBulletPercent, suffix: '%' },
-        { label: t("model:itemModel.featureMeleePercent"), prefix: '', value: stats?.featureMeleePercent, suffix: '%' },
-        { label: t("model:itemModel.featureFirePercent"), prefix: '', value: stats?.featureFirePercent, suffix: '%' },
-        { label: t("model:itemModel.featureBlastPercent"), prefix: '', value: stats?.featureBlastPercent, suffix: '%' },
-        { label: t("model:itemModel.featurePassthroughPercent"), prefix: '', value: stats?.featurePassthroughPercent, suffix: '%' },
-        { label: t("model:itemModel.massLimit"), prefix: '', value: stats?.massLimit, suffix: ' kg' },
-        { label: t("model:itemModel.addsEnergy"), prefix: '', value: stats?.addsEnergy, suffix: ' pts.' },
-        { label: t("model:itemModel.power"), prefix: '', value: stats?.power, suffix: '%' },
+        { label: t("fields.maxCabinSpeed"), prefix: '', value: stats?.maxCabinSpeed, suffix: ' km/h' },
+        { label: t("fields.maxChassisSpeed"), prefix: '', value: stats?.maxChassisSpeed, suffix: ' km/h' },
+        { label: t("fields.tonnage"), prefix: '+', value: stats?.tonnage, suffix: ' kg' },
+        { label: t("fields.featureBulletPercent"), prefix: '', value: stats?.featureBulletPercent, suffix: '%' },
+        { label: t("fields.featureMeleePercent"), prefix: '', value: stats?.featureMeleePercent, suffix: '%' },
+        { label: t("fields.featureFirePercent"), prefix: '', value: stats?.featureFirePercent, suffix: '%' },
+        { label: t("fields.featureBlastPercent"), prefix: '', value: stats?.featureBlastPercent, suffix: '%' },
+        { label: t("fields.featurePassthroughPercent"), prefix: '', value: stats?.featurePassthroughPercent, suffix: '%' },
+        { label: t("fields.massLimit"), prefix: '', value: stats?.massLimit, suffix: ' kg' },
+        { label: t("fields.addsEnergy"), prefix: '', value: stats?.addsEnergy, suffix: ' pts.' },
+        { label: t("fields.power"), prefix: '', value: stats?.power, suffix: '%' },
     ].filter((x): x is { label: string, prefix: string, value: number, suffix: string } => !!x.value);
 
     const decorStats = [
-        { label: t("model:itemModel.increasesReputationPercent"), prefix: '+', value: stats?.increasesReputationPercent, suffix: '%' },
+        { label: t("fields.increasesReputationPercent"), prefix: '+', value: stats?.increasesReputationPercent, suffix: '%' },
     ].filter((x): x is { label: string, prefix: string, value: number, suffix: string } => !!x.value);
 
     const generalStats = [
-        { label: t("model:itemModel.durability"), value: stats?.durability, suffix: ' pts.' },
-        { label: t("model:itemModel.energyDrain"), value: stats?.energyDrain, suffix: ' pts.' },
-        { label: t("model:itemModel.mass"), value: stats?.mass, suffix: ' kg' }
+        { label: t("fields.durability"), value: stats?.durability, suffix: ' pts.' },
+        { label: t("fields.energyDrain"), value: stats?.energyDrain, suffix: ' pts.' },
+        { label: t("fields.mass"), value: stats?.mass, suffix: ' kg' }
     ].filter((x): x is { label: string, value: number, suffix: string } => !!x.value);
 
     return <div className="text-white space-y-2">
         <div className="p-4 flex flex-row items-baseline space-x-1 bg-neutral-800 justify-between">
-            <h1 className="text-2xl">{t("model:itemStats")}</h1>
+            <h1 className="text-2xl">{t("fields.itemStats")}</h1>
             <p className="text-sm text-xoPrimary">Updated {dayjs(stats?.timestamp).fromNow() ?? -1}</p>
         </div>
         <div className="space-y-2">
             <div className="bg-neutral-800 px-4 py-3 flex flex-row justify-between">
-                <span className="font-bold">{t("model:itemModel.ps")}</span>
+                <span className="font-bold">{t("fields.ps")}</span>
                 <span>{stats?.ps}</span>
             </div>
             <div className="space-y-2">
