@@ -31,7 +31,12 @@ function classNames(...classes: string[]) {
 }
 
 const createRecipeTree = (depth: number): object | boolean => {
-  if (depth <= 0) return true;
+  if (depth <= 0)
+    return {
+      include: {
+        translations: true,
+      },
+    };
 
   return {
     include: {
@@ -50,55 +55,54 @@ const createRecipeTree = (depth: number): object | boolean => {
 };
 
 const itemInclude = Prisma.validator<Prisma.ItemInclude>()({
-    translations: true,
-    type: {
-      include: { translations: true },
+  translations: true,
+  type: {
+    include: { translations: true },
+  },
+  category: {
+    include: { translations: true },
+  },
+  faction: true,
+  rarity: true,
+  itemStats: {
+    orderBy: {
+      timestamp: "desc",
     },
-    category: {
-      include: { translations: true },
-    },
-    faction: true,
-    rarity: true,
-    itemStats: {
-      orderBy: {
-        timestamp: "desc",
-      },
-      take: 1,
-      // include: {
-      //   user: {
-      //     select: {
-      //       name: true,
-      //     },
-      //   },
-      //   release: true,
-      // },
-    },
-    recipes: {
-      include: {
-        ingredients: {
-          include: {
-            item: createRecipeTree(7),
-          },
+    take: 1,
+    // include: {
+    //   user: {
+    //     select: {
+    //       name: true,
+    //     },
+    //   },
+    //   release: true,
+    // },
+  },
+  recipes: {
+    include: {
+      ingredients: {
+        include: {
+          item: createRecipeTree(7),
         },
       },
     },
-    market: {
-      orderBy: {
-        timestamp: "desc",
-      },
-      take: 1,
+  },
+  market: {
+    orderBy: {
+      timestamp: "desc",
     },
-    itemSynergies: {
-      include: {
-        synergy: {
-          include: {
-            synergyItems: {
-              include: {
-                item: {
-                  include: {
-                    rarity: true,
-                    category: true,
-                  },
+    take: 1,
+  },
+  itemSynergies: {
+    include: {
+      synergy: {
+        include: {
+          synergyItems: {
+            include: {
+              item: {
+                include: {
+                  rarity: true,
+                  category: true,
                 },
               },
             },
@@ -106,10 +110,11 @@ const itemInclude = Prisma.validator<Prisma.ItemInclude>()({
         },
       },
     },
+  },
 });
 
 export type ItemFindUniqueOutput = Prisma.ItemGetPayload<{
-  include: typeof itemInclude,
+  include: typeof itemInclude;
 }>;
 
 export default function ItemPage() {
@@ -134,8 +139,9 @@ export default function ItemPage() {
           height={128}
         />
         <div className="block space-y-2">
-
-          <h1 className="text-3xl text-white">{data.translations.find((tf) => tf.languageCode === lang)?.value}</h1>
+          <h1 className="text-3xl text-white">
+            {data.translations.find((tf) => tf.languageCode === lang)?.value}
+          </h1>
           <div className="space-x-1">
             <span
               className={`rounded-lg px-2 py-0.5 font-bold ${

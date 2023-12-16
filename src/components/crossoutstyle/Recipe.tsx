@@ -1,7 +1,7 @@
 import Item from "./Item";
 import { ChevronDown, ChevronRight } from "react-feather";
 import { useContext, useState } from "react";
-import { RecipeContext, RecipeContextData } from "./RecipeCard";
+import { RecipeContext, RecipeContextData, resourceIds } from "./RecipeCard";
 import { createRecipePath } from "~/lib/recipePath";
 import Select from "./Select";
 import PrimaryButton from "./PrimaryButton";
@@ -44,10 +44,9 @@ interface RecipeProps {
 }
 
 const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
-  if (!item) return <></>;
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  
+
   const recipeContext = useContext(RecipeContext);
   const recipeState = recipeContext?.value.find(
     (x) => x.recipePath === createRecipePath(recipePath, item?.id),
@@ -57,6 +56,7 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   );
   const isMediumDevice = useIsMediumDevice();
 
+  if (!item) return <></>;
 
   const expanded = recipeState?.active;
   const setExpanded = (newActive: boolean) => {
@@ -90,11 +90,11 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
     }
   };
 
-  const changeRecipe = (newRecipeId: number) => {
+  const changeRecipe = (newRecipeId: number, craftCost: number) => {
     if (recipeState && recipeContext) {
       // Build new state
       recipeContext.setValue([
-        { ...recipeState, selectedRecipeId: newRecipeId },
+        { ...recipeState, selectedRecipeId: newRecipeId, craftCost },
         ...recipeContext.value.filter((x) => {
           if (x.recipePath === recipeState.recipePath) return false;
           return true;
@@ -116,25 +116,25 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
     }
   };
 
-  const hasRecipes = item.recipes?.length > 0;
+  const hasMultipleRecipes = item.recipes?.length > 1;
+  const hasRecipe = item.recipes?.length > 0;
+  const craftCost = recipeState?.craftCost ?? 0;
   const sellPriceMin = item.sellPriceMin ?? 0;
   const buyPriceMax = item.buyPriceMax ?? 0;
   const price = recipeState?.price ?? 0;
   const sharedStyleClasses = "bg-neutral-800 p-2";
   const indentMultiplier = 20;
 
-  console.log(item);
-
   return (
     <>
       <div className={`grid space-x-1 md:grid-cols-1 lg:grid-cols-3`}>
         <div
           className={`flex flex-row items-center space-x-2 ${sharedStyleClasses} ${
-            !hasRecipes && "pl-10"
+            !hasRecipe && "pl-10"
           }`}
           style={{ marginLeft: depth * indentMultiplier }}
         >
-          {hasRecipes ? (
+          {hasRecipe ? (
             expanded ? (
               <ChevronDown onClick={() => setExpanded(!expanded)} />
             ) : (
@@ -144,21 +144,37 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
             <></>
           )}
           <Item
-            name={item.translations?.find((tf) => tf.languageCode === lang)?.value ?? item.name}
+            name={
+              item.translations?.find((tf) => tf.languageCode === lang)
+                ?.value ?? item.name
+            }
             id={item.id}
             rarityId={item.rarityId}
             size="small"
           />
+          {hasMultipleRecipes && (
+            <Select
+              entries={item.recipes.map((recipe) => ({
+                key: recipe.id.toString(),
+                label: "Recipe " + recipe.id,
+                value: recipe.id,
+              }))}
+              onChange={(selectedEntry) =>
+                changeRecipe(selectedEntry.value as number, item.recipes.find(x => x.id === selectedEntry.value)?.craftCost ?? 0)
+              }
+              defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
+            />
+          )}
         </div>
         <div
           className={`flex flex-row items-center justify-start space-x-2 ${sharedStyleClasses}`}
           style={isMediumDevice ? { marginLeft: depth * indentMultiplier } : {}}
         >
-          {hasRecipes && expanded ? (
-            <span>Craft</span>
+          {hasRecipe && expanded ? (
+            <span>{`Craft recipe needs [ ${recipeState?.ingredientQty} ] and each recipe makes [ ${recipeState?.recipeQty} ], craft [ ${recipeState?.ingredientQty/recipeState?.recipeQty} ] `}</span>
           ) : (
             <div className="flex flex-row items-center space-x-1">
-              <span>Buy for</span>
+              <span>{`Buy [ ${recipeState?.ingredientQty} ] for`}</span>
               <Price value={recipeState?.price ?? 0} />
               <span>each</span>
             </div>
@@ -167,21 +183,6 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
         <div
           style={isMediumDevice ? { marginLeft: depth * indentMultiplier } : {}}
         >
-          {hasRecipes && expanded ? (
-            <div
-              className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
-            >
-              <Select
-                entries={item.recipes.map((recipe) => ({
-                  key: recipe.id.toString(),
-                  label: "Recipe " + recipe.id,
-                  value: recipe.id,
-                }))}
-                onChange={(selectedEntry) => changeRecipe(selectedEntry.value as number)}
-                defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
-              />
-            </div>
-          ) : (
             <div
               className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
             >
@@ -190,38 +191,37 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
                   message={"Item is not available\n on the market"}
                 />
               )}
-              <input
-                type="text"
-                size={8}
-                className="border-xoPrimary focus:border-xoQuaternary border bg-black px-2 text-right text-white hover:border-white focus:shadow focus:shadow-orange-500 focus:outline-none"
-                value={customPrice}
-                onChange={(e) => {
-                  setCustomPrice(e.target.value);
-                }}
-                onBlur={(e) => {
-                  changePrice(parseFloat(e.target.value) * 100);
-                }}
-              />
               <PrimaryButton
+                disabled={craftCost === 0}
+                onClick={() => {
+                  changePrice(craftCost);
+                  setCustomPrice(calculateFloatPrice(craftCost).toFixed(2));
+                }}
+                active={price !== 0 && price === craftCost}
+              >
+                <Price value={craftCost} />
+              </PrimaryButton>
+              <PrimaryButton
+                disabled={buyPriceMax === 0}
                 onClick={() => {
                   changePrice(buyPriceMax);
                   setCustomPrice(calculateFloatPrice(buyPriceMax).toFixed(2));
                 }}
-                active={price === buyPriceMax}
+                active={price !== 0 && price === buyPriceMax}
               >
                 <Price value={buyPriceMax} />
               </PrimaryButton>
               <PrimaryButton
+                disabled={sellPriceMin === 0}
                 onClick={() => {
                   changePrice(sellPriceMin);
                   setCustomPrice(calculateFloatPrice(sellPriceMin).toFixed(2));
                 }}
-                active={price === sellPriceMin}
+                active={price !== 0 && price === sellPriceMin}
               >
                 <Price value={sellPriceMin} />
               </PrimaryButton>
             </div>
-          )}
         </div>
       </div>
       {expanded && mapRecipes(item, recipePath, recipeState, depth + 1)}
