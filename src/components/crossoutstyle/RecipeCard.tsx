@@ -136,6 +136,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
     setBomRecords(getBOM_Records(recipeRecords));
   }, [recipeRecords]);
 
+  const sortedBomRecords = [...bomRecords].sort(
+    (a, b) => a.condensedItem.id - b.condensedItem.id,
+  );
+
   if (!data) return <></>;
 
   return (
@@ -184,7 +188,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
       >
         <div className="space-y-2">
-          {bomRecords.map((bomRecord) => (
+          {sortedBomRecords.map((bomRecord) => (
             <RecipeBOM key={bomRecord.condensedItem.id} bomRecord={bomRecord} />
           ))}
         </div>
