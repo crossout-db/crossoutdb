@@ -1,5 +1,11 @@
 import Recipe from "./Recipe";
-import { Dispatch, SetStateAction, createContext, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from "react";
 import _, { min } from "lodash";
 import PrimaryButton from "./PrimaryButton";
 import { createRecipePath } from "~/lib/recipePath";
@@ -57,6 +63,7 @@ export const resourceIds = [2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877];
 const mapRecipesRecursive = (
   item: ItemFindUniqueOutput,
   ingredientQty: number,
+  parentActive: boolean,
   recipePath: string,
 ): RecipeContextData => {
   if (!item) return [];
@@ -69,17 +76,18 @@ const mapRecipesRecursive = (
       item.recipes[1]?.craftCost !== 0
     ) {
       recipeIdx = 1;
-      console.log(item.recipes[1]?.itemId);
     }
   }
   const craftCost = item.recipes[recipeIdx]?.craftCost ?? 0;
-  const price = minGrZero([
-    item.buyPriceMax ?? 0,
-    item.sellPriceMin ?? 0,
-    craftCost,
-  ]);
+  const price = minGrZero([item.buyPriceMax ?? 0, craftCost]);
   const craftCostSelected =
-    price === craftCost && !resourceIds.includes(item.id) ? true : false;
+    price === craftCost && !resourceIds.includes(item.id) ? parentActive : false;
+
+  const action = (() => {
+    if (craftCostSelected) return "craft";
+    if (parentActive) return "buy";
+    return "nothing";
+  })();
 
   result = [
     ...result,
@@ -96,7 +104,7 @@ const mapRecipesRecursive = (
       recipeQty: item.recipes[recipeIdx]?.quantity ?? 0,
       ingredientQty,
       active: craftCostSelected,
-      action: "nothing",
+      action: action,
     },
     ...item.recipes
       .map((recipe) =>
@@ -105,6 +113,7 @@ const mapRecipesRecursive = (
             // @ts-ignore
             ingredient.item,
             ingredient.quantity,
+            craftCostSelected,
             createRecipePath(recipePath, item.id),
           ),
         ),
@@ -117,11 +126,9 @@ const mapRecipesRecursive = (
 const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
   const { t } = useTranslation();
   const [recipeState, setRecipeState] = useState(
-    mapRecipesRecursive(data, 1, ""),
+    mapRecipesRecursive(data, 1, true, ""),
   );
   const [bomState, setBomState] = useState<BOMContextData>([]);
-
-  if (!data) return <></>;
 
   const recipeStateProvider = {
     value: recipeState,
@@ -132,6 +139,37 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
     value: bomState,
     setValue: setBomState,
   };
+
+  const activeItems = recipeState.filter(
+    (x) => x.action === "buy",
+  );
+  const aggregateItems = activeItems.reduce((acc, row) => {
+    const existingItem = acc.find(
+      (i) => i.condensedItem.id === row.condensedItem.id,
+    );
+    if (existingItem) {
+      existingItem.quantity += row.ingredientQty;
+    } else {
+      const newRow = {
+        condensedItem: row.condensedItem,
+        craftCost: row.craftCost,
+        buyPriceMax: row.price,
+        sellPriceMin: row.price,
+        price: row.price,
+        quantity: row.ingredientQty,
+      };
+      acc.push(newRow);
+    }
+    return acc;
+  }, [] as BOMContextData);
+
+  //   useEffect(() => {
+  //     setBomState(aggregateItems);
+  //   }, [aggregateItems, recipeState]);
+
+  console.log(aggregateItems);
+
+  if (!data) return <></>;
 
   return (
     <div className="space-y-2 text-white">

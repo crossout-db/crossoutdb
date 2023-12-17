@@ -21,6 +21,7 @@ import RecipeCard from "~/components/crossoutstyle/RecipeCard";
 import { trpc } from "~/lib/trpc";
 
 import { Prisma } from "@prisma/client";
+import ImageFallback from "~/components/ImageFallback";
 
 type Props = {
   // Add custom props here
@@ -133,8 +134,10 @@ export default function ItemPage() {
   return (
     <div className="space-y-8">
       <div className="flex flex-row items-center space-x-2">
-        <img
-          src={"/images/items-highres/" + data.id + ".png"}
+        <ImageFallback
+          src={"https://crossoutdb.com/img/items/" + data.id + ".png"}
+          fallbackSrc="/icons/crossoutdb.svg"
+          alt={data.translations.find((tf) => tf.languageCode === lang)?.value}
           width={128}
           height={128}
         />
