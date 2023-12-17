@@ -1,7 +1,7 @@
 import Item from "./Item";
 import { ChevronDown, ChevronRight } from "react-feather";
 import { useContext, useState } from "react";
-import { RecipeContext, RecipeContextData, resourceIds } from "./RecipeCard";
+import { RecipeContext, RecipeContextData, RecipeRecord, resourceIds } from "./RecipeCard";
 import { createRecipePath } from "~/lib/recipePath";
 import Select from "./Select";
 import PrimaryButton from "./PrimaryButton";
@@ -16,7 +16,7 @@ import { useTranslation } from "next-i18next";
 const mapRecipes = (
   item: ItemFindUniqueOutput | undefined,
   recipePath: string,
-  recipeState: RecipeContextData[number],
+  recipeState: RecipeRecord,
   depth: number,
 ): React.ReactNode => {
   if (!item || !item.recipes) return <></>;
@@ -48,7 +48,7 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   const lang = i18n.language;
 
   const recipeContext = useContext(RecipeContext);
-  const recipeState = recipeContext?.value.find(
+  const recipeState = recipeContext?.recipeRecords.find(
     (x) => x.recipePath === createRecipePath(recipePath, item?.id),
   );
   const [customPrice, setCustomPrice] = useState(
@@ -61,26 +61,26 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   const expanded = recipeState?.active;
   const setExpanded = (newActive: boolean) => {
     if (recipeState && recipeContext) {
-      let childRecipes: RecipeContextData = [];
+      let childRecipes: RecipeRecord[] = [];
       if (!newActive) {
         // Find child recipes to set as inactive/collapsed and action to "nothing" if parent collapses
-        childRecipes = recipeContext.value
+        childRecipes = recipeContext?.recipeRecords
           .filter((x) => x.recipePath.includes(recipeState.recipePath + "_"))
           .map((x) => ({ ...x, active: false, action: "nothing" }));
       }
       if (newActive) {
         // Set first child recipe action to "buy"
         // TODO: doesn't work correctly. a recipe can have more than one direct child
-        const buyRecipe = recipeContext.value
+        const buyRecipe = recipeContext?.recipeRecords
           .filter((x) => x.recipePath.includes(recipeState.recipePath + "_"))
           .sort((a, b) => a.recipePath.length - b.recipePath.length)[0];
         if (buyRecipe) childRecipes = [{ ...buyRecipe, action: "buy" }];
       }
       // Build new state
-      recipeContext.setValue([
+      recipeContext.setRecipeRecords([
         { ...recipeState, active: newActive, action: "craft" },
         ...childRecipes,
-        ...recipeContext.value.filter((x) => {
+        ...recipeContext?.recipeRecords.filter((x) => {
           if (x.recipePath === recipeState.recipePath) return false;
           if (childRecipes.some((y) => x.recipePath === y.recipePath))
             return false;
@@ -93,9 +93,9 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   const changeRecipe = (newRecipeId: number, craftCost: number) => {
     if (recipeState && recipeContext) {
       // Build new state
-      recipeContext.setValue([
+      recipeContext.setRecipeRecords([
         { ...recipeState, selectedRecipeId: newRecipeId, craftCost },
-        ...recipeContext.value.filter((x) => {
+        ...recipeContext?.recipeRecords.filter((x) => {
           if (x.recipePath === recipeState.recipePath) return false;
           return true;
         }),
@@ -106,9 +106,9 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   const changePrice = (newPrice: number) => {
     if (recipeState && recipeContext) {
       // Build new state
-      recipeContext.setValue([
+      recipeContext.setRecipeRecords([
         { ...recipeState, price: newPrice },
-        ...recipeContext.value.filter((x) => {
+        ...recipeContext?.recipeRecords.filter((x) => {
           if (x.recipePath === recipeState.recipePath) return false;
           return true;
         }),

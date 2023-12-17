@@ -1,17 +1,18 @@
 import { useContext } from "react";
-import { BOMContext, RecipeContext } from "./RecipeCard";
+import { RecipeContext } from "./RecipeCard";
 import Price from "./Price";
 
 interface RecipeSummaryProps {}
 
 const RecipeSummary: React.FC<RecipeSummaryProps> = ({}) => {
-  const bomContext = useContext(BOMContext);
+  const bomContext = useContext(RecipeContext);
 
   if (!bomContext) return <></>;
 
-  const totalCost = bomContext.value
-    .map((x) => x.price * x.quantity)
-    .reduce((a, b) => a + b, 0);
+  const totalCost = bomContext.bomRecords.reduce(
+    (acc, curr) => acc + curr.totalCost,
+    0,
+  );
 
   return (
     <>
@@ -21,14 +22,14 @@ const RecipeSummary: React.FC<RecipeSummaryProps> = ({}) => {
         ></div>
         <div
           className={`flex flex-row items-center justify-start space-x-2 bg-neutral-800 p-2`}
-        ></div>
-        <div
-          className={`flex flex-row items-center justify-start space-x-2 bg-neutral-800 p-2`}
         >
           <span className="border border-xoPrimary bg-black px-2 text-right text-white hover:border-white focus:border-xoQuaternary focus:shadow focus:shadow-orange-500 focus:outline-none">
             <Price value={totalCost} />
           </span>
         </div>
+        <div
+          className={`flex flex-row items-center justify-start space-x-2 bg-neutral-800 p-2`}
+        ></div>
       </div>
     </>
   );

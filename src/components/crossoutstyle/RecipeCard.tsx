@@ -16,42 +16,38 @@ import { minGrZero } from "~/lib/minGrZero";
 import RecipeBOM from "./RecipeBOM";
 import Price from "./Price";
 
-export type RecipeContextData = {
+export type RecipeRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
   recipePath: string;
   selectedRecipeId: number | undefined;
   craftCost: number;
+  buyPriceMax: number;
+  sellPriceMin: number;
   price: number;
   recipeQty: number;
   ingredientQty: number;
   active: boolean;
   action: "nothing" | "custom" | "craft" | "buy" | "sell";
-}[];
-
-type RecipeStateProvider = {
-  value: RecipeContextData;
-  setValue: Dispatch<SetStateAction<RecipeContextData>>;
 };
 
-export const RecipeContext = createContext<RecipeStateProvider | undefined>(
-  undefined,
-);
-
-export type BOMContextData = {
+export type BOM_Record = {
   condensedItem: { name: string; id: number; rarityId: number };
   craftCost: number;
   buyPriceMax: number;
   sellPriceMin: number;
   price: number;
   quantity: number;
-}[];
-
-type BOMStateProvider = {
-  value: BOMContextData;
-  setValue: Dispatch<SetStateAction<BOMContextData>>;
+  totalCost: number;
 };
 
-export const BOMContext = createContext<BOMStateProvider | undefined>(
+export interface RecipeContextData {
+  recipeRecords: RecipeRecord[];
+  bomRecords: BOM_Record[];
+  setRecipeRecords: Dispatch<SetStateAction<RecipeRecord[]>>;
+  setBomRecords: Dispatch<SetStateAction<BOM_Record[]>>;
+}
+
+export const RecipeContext = createContext<RecipeContextData | undefined>(
   undefined,
 );
 
@@ -65,10 +61,10 @@ const mapRecipesRecursive = (
   ingredientQty: number,
   parentActive: boolean,
   recipePath: string,
-): RecipeContextData => {
+): RecipeRecord[] => {
   if (!item) return [];
 
-  let result: RecipeContextData = [];
+  let result: RecipeRecord[] = [];
   let recipeIdx = 0;
   if (item.recipes.length > 1) {
     if (
@@ -79,9 +75,13 @@ const mapRecipesRecursive = (
     }
   }
   const craftCost = item.recipes[recipeIdx]?.craftCost ?? 0;
-  const price = minGrZero([item.buyPriceMax ?? 0, craftCost]);
+  const buyPriceMax = item.buyPriceMax ?? 0;
+  const sellPriceMin = item.sellPriceMin ?? 0;
+  const price = minGrZero([buyPriceMax, craftCost]);
   const craftCostSelected =
-    price === craftCost && !resourceIds.includes(item.id) ? parentActive : false;
+    price === craftCost && !resourceIds.includes(item.id)
+      ? parentActive
+      : false;
 
   const action = (() => {
     if (craftCostSelected) return "craft";
@@ -100,6 +100,8 @@ const mapRecipesRecursive = (
       recipePath: createRecipePath(recipePath, item.id),
       selectedRecipeId: item.recipes[recipeIdx]?.id,
       craftCost: craftCost,
+      buyPriceMax: buyPriceMax,
+      sellPriceMin: sellPriceMin,
       price: price,
       recipeQty: item.recipes[recipeIdx]?.quantity ?? 0,
       ingredientQty,
@@ -125,49 +127,14 @@ const mapRecipesRecursive = (
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
   const { t } = useTranslation();
-  const [recipeState, setRecipeState] = useState(
+  const [recipeRecords, setRecipeRecords] = useState(
     mapRecipesRecursive(data, 1, true, ""),
   );
-  const [bomState, setBomState] = useState<BOMContextData>([]);
+  const [bomRecords, setBomRecords] = useState<BOM_Record[]>([]);
 
-  const recipeStateProvider = {
-    value: recipeState,
-    setValue: setRecipeState,
-  };
-
-  const bomStateProvider = {
-    value: bomState,
-    setValue: setBomState,
-  };
-
-  const activeItems = recipeState.filter(
-    (x) => x.action === "buy",
-  );
-  const aggregateItems = activeItems.reduce((acc, row) => {
-    const existingItem = acc.find(
-      (i) => i.condensedItem.id === row.condensedItem.id,
-    );
-    if (existingItem) {
-      existingItem.quantity += row.ingredientQty;
-    } else {
-      const newRow = {
-        condensedItem: row.condensedItem,
-        craftCost: row.craftCost,
-        buyPriceMax: row.price,
-        sellPriceMin: row.price,
-        price: row.price,
-        quantity: row.ingredientQty,
-      };
-      acc.push(newRow);
-    }
-    return acc;
-  }, [] as BOMContextData);
-
-  //   useEffect(() => {
-  //     setBomState(aggregateItems);
-  //   }, [aggregateItems, recipeState]);
-
-  console.log(aggregateItems);
+  useEffect(() => {
+    setBomRecords(getBOM_Records(recipeRecords));
+  }, [recipeRecords]);
 
   if (!data) return <></>;
 
@@ -177,8 +144,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         <h1 className="text-2xl">{t("fields.recipe")}</h1>
         <PrimaryButton
           onClick={() =>
-            setRecipeState(
-              recipeState.map((x) => {
+            setRecipeRecords(
+              recipeRecords.map((x) => {
                 if (!resourceIds.includes(x.condensedItem.id))
                   return { ...x, active: true };
                 return x;
@@ -190,7 +157,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         </PrimaryButton>
         <PrimaryButton
           onClick={() =>
-            setRecipeState(recipeState.map((x) => ({ ...x, active: false })))
+            setRecipeRecords(
+              recipeRecords.map((x) => ({ ...x, active: false })),
+            )
           }
         >
           Collapse all
@@ -199,7 +168,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         <span>Buy Price Max</span>
         <span>Sell Price Min</span>
       </div>
-      <RecipeContext.Provider value={recipeStateProvider}>
+      <RecipeContext.Provider
+        value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
+      >
         <div className="space-y-2">
           <Recipe item={data} recipePath="" depth={0} />
         </div>
@@ -209,14 +180,46 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         <h1 className="text-2xl">{t("Recipe.BOM")}</h1>
       </div>
 
-      <BOMContext.Provider value={bomStateProvider}>
+      <RecipeContext.Provider
+        value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
+      >
         <div className="space-y-2">
-          <RecipeBOM item={data} />
+          {bomRecords.map((bomRecord) => (
+            <RecipeBOM key={bomRecord.condensedItem.id} bomRecord={bomRecord} />
+          ))}
         </div>
-      </BOMContext.Provider>
-      <RecipeSummary />
+        <RecipeSummary />
+      </RecipeContext.Provider>
     </div>
   );
 };
 
 export default RecipeCard;
+
+function getBOM_Records(recipeRecords: RecipeRecord[]) {
+  const activeItems = recipeRecords.filter((x) => x.action === "buy");
+  const aggregateItems = activeItems.reduce((acc, row) => {
+    const existingItem = acc.find(
+      (i) => i.condensedItem.id === row.condensedItem.id,
+    );
+    if (existingItem) {
+      existingItem.quantity += row.ingredientQty;
+    } else {
+      const newRow = {
+        condensedItem: row.condensedItem,
+        craftCost: row.craftCost,
+        buyPriceMax: row.buyPriceMax,
+        sellPriceMin: row.sellPriceMin,
+        price: row.price,
+        quantity: row.ingredientQty,
+        totalCost: 0,
+      };
+      acc.push(newRow);
+    }
+    return acc;
+  }, [] as BOM_Record[]);
+  aggregateItems.forEach((x) => {
+    x.totalCost = x.quantity * x.price;
+  });
+  return aggregateItems;
+}
