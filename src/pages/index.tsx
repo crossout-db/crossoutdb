@@ -50,34 +50,13 @@ const Market: NextPage = () => {
     include: itemInclude,
   });
 
+  const { data: categories } = trpc.category.findMany.useQuery({});
+  
+  const { data: rarities } = trpc.rarity.findMany.useQuery({});
+
   if (!data) {
     return <div className="block overflow-auto">{t("loading")}</div>;
   }
-
-  const categories = {
-    categories: uniqBy(
-      data.map((item) => {
-        return {
-          xodbId: item.category.id,
-          order: item.category.id,
-          LocNames: [{ name: item.category.name }],
-        };
-      }),
-      (category) => category.xodbId,
-    ).filter((category) => category.xodbId !== 0),
-  };
-  const rarities = {
-    rarities: uniqBy(
-      data.map((item) => {
-        return {
-          xodbId: item.rarity.id,
-          order: item.rarity.id,
-          LocNames: [{ name: item.rarity.name }],
-        };
-      }),
-      (rarity) => rarity.xodbId,
-    ),
-  };
 
   return (
     <MarketTable data={data} categories={categories} rarities={rarities} />

@@ -30,14 +30,14 @@ const NavBar: React.FC = ({}) => {
   ];
 
   const userLinks = [
-    {
-      name: t("pages.navbar.user.profile"),
-      href: "/profile",
-    },
-    {
-      name: t("pages.navbar.user.settings"),
-      href: "/settings",
-    },
+    // {
+    //   name: t("pages.navbar.user.profile"),
+    //   href: "/profile",
+    // },
+    // {
+    //   name: t("pages.navbar.user.settings"),
+    //   href: "/settings",
+    // },
     {
       name: t("pages.navbar.user.signOut"),
       onClick: () => void signOut(),

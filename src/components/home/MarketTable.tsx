@@ -1,3 +1,4 @@
+import { type Category, type Rarity } from "@prisma/client";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "next-i18next";
 import { useMemo } from "react";
@@ -6,14 +7,15 @@ import Item from "@components/Item";
 import Price from "@components/Price";
 import { type ItemFindManyWithMarketOutput } from "~/pages/index";
 
-import DataTable, { type CategoryData, type RarityData } from "./DataTable";
+import DataTable from "./DataTable";
+
 
 
 // Define the props
 interface MarketTableProps {
   data: ItemFindManyWithMarketOutput[];
-  categories: CategoryData;
-  rarities: RarityData;
+  categories?: Category[];
+  rarities?: Rarity[];
 }
 
 // Use the props in the function component
