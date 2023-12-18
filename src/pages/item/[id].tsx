@@ -1,35 +1,21 @@
+import { Prisma } from "@prisma/client";
+import { type GetServerSideProps, type NextPage } from "next";
 import { useRouter } from "next/router";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useState } from "react";
-import Image from "next/image";
-import Head from "next/head";
-import Link from "next/link";
-import { Tab } from "@headlessui/react";
-import { GetServerSideProps, type NextPage } from "next";
-import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { useTranslation } from "next-i18next";
 
-import Price from "~/components/crossoutstyle/Price";
-import { calculateProfit, calculateROI } from "~/lib/priceCalc";
-import PriceCard from "~/components/crossoutstyle/PriceCard";
-import Item from "~/components/crossoutstyle/Item";
+import ImageFallback from "@components/ImageFallback";
+import PriceCard from "@components/item/PriceCard";
+import RecipeCard from "@components/item/RecipeCard";
+import StatsCard from "@components/item/StatsCard";
+import SynergyCard from "@components/item/SynergyCard";
+import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import rarityStyles from "~/lib/rarityStyles";
-import StatsCard from "~/components/crossoutstyle/StatsCard";
-import dayjs from "dayjs";
-import SynergyCard from "~/components/crossoutstyle/SynergyCard";
-import RecipeCard from "~/components/crossoutstyle/RecipeCard";
 import { trpc } from "~/lib/trpc";
 
-import { Prisma } from "@prisma/client";
-import ImageFallback from "~/components/ImageFallback";
 
 type Props = {
   // Add custom props here
 };
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const createRecipeTree = (depth: number): object | boolean => {
   if (depth <= 0)

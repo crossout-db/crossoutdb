@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Icon } from 'react-feather';
+import { X, type Icon } from 'react-feather';
 
 interface TextFieldProps {
     placeholder?: string;

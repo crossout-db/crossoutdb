@@ -1,21 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import React, { useState } from "react";
-import xodblogo from "~/../public/images/xodblogo150.png";
-import { Menu } from "react-feather";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User } from "next-auth";
-import Avatar from "../Avatar";
-import { signIn, signOut } from "next-auth/react";
-import { useCurrentUser } from "~/lib/context";
 import { useRouter } from "next/router";
+import { signIn, signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
+import React, { useState } from "react";
+import { Menu } from "react-feather";
 
-interface NavBarProps {}
+import Avatar from "@components/Avatar";
+import xodblogo from "public/images/xodblogo150.png";
+import { useCurrentUser } from "~/lib/context";
 
-const NavBar: React.FC<NavBarProps> = ({}) => {
+
+const NavBar: React.FC = ({}) => {
   const [menuActive, setMenuActive] = useState(false);
   const [userControlsActive, setUserControlsActive] = useState(false);
   const pathname = usePathname();

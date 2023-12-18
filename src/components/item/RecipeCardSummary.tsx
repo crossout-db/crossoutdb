@@ -1,10 +1,12 @@
 import { useContext } from "react";
+
+import Price from "@components/Price";
+
 import { RecipeContext } from "./RecipeCard";
-import Price from "./Price";
 
-interface RecipeSummaryProps {}
+interface RecipeCardSummaryProps {}
 
-const RecipeSummary: React.FC<RecipeSummaryProps> = ({}) => {
+const RecipeCardSummary: React.FC<RecipeCardSummaryProps> = ({}) => {
   const bomContext = useContext(RecipeContext);
 
   if (!bomContext) return <></>;
@@ -35,4 +37,4 @@ const RecipeSummary: React.FC<RecipeSummaryProps> = ({}) => {
   );
 };
 
-export default RecipeSummary;
+export default RecipeCardSummary;

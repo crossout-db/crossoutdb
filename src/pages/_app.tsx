@@ -1,11 +1,11 @@
+import { type AppType, type AppProps } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { type AppType, type AppProps } from "next/app";
-import nextI18NextConfig from "next-i18next.config.mjs";
 import { appWithTranslation } from "next-i18next";
 import { type ComponentType } from "react";
-import Layout from "~/components/Layout";
 
+import Layout from "@components/Layout";
+import nextI18NextConfig from "next-i18next.config.mjs";
 import { trpc } from "~/lib/trpc";
 
 import "~/styles/globals.css";

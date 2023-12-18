@@ -225,7 +225,7 @@ model Item {
     id Int @id @default(autoincrement())
     oldId Int?
     name String
-    marketDef String? @omit
+    marketDef String? @@allow('read', auth().role == "ADMIN")
     quantity Int
     type Type @relation(fields: [typeId], references: [id])
     typeId Int
@@ -350,7 +350,7 @@ model Market {
     id Int @id @default(autoincrement())
     item Item @relation(fields: [itemId], references: [id])
     itemId Int
-    marketDef String @omit
+    marketDef String @@allow('read', auth().role == "ADMIN")
     sellPriceMin Int
     sellOrders Int
     buyPriceMax Int
@@ -440,9 +440,9 @@ model User {
     id String @id @default(cuid())
     name String?
     role UserRole @default(USER)
-    email String? @unique @omit
-    emailVerified DateTime? @omit
-    image String? @omit
+    email String? @unique @@allow('read', auth().role == "ADMIN")
+    emailVerified DateTime? @@allow('read', auth().role == "ADMIN")
+    image String? @@allow('read', auth().role == "ADMIN")
     accounts Account[]
     sessions Session[]
     itemStats ItemStats[]

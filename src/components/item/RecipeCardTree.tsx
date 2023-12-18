@@ -1,17 +1,18 @@
-import Item from "./Item";
-import { ChevronDown, ChevronRight } from "react-feather";
-import { useContext, useState } from "react";
-import { RecipeContext, RecipeContextData, RecipeRecord, resourceIds } from "./RecipeCard";
-import { createRecipePath } from "~/lib/recipePath";
-import Select from "./Select";
-import PrimaryButton from "./PrimaryButton";
-import Price from "./Price";
-import { calculateFloatPrice } from "~/lib/priceCalc";
-import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
-import RecipeAlert from "./RecipeAlert";
-import { sortBy } from "lodash";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 import { useTranslation } from "next-i18next";
+import { useContext, useState } from "react";
+import { ChevronDown, ChevronRight } from "react-feather";
+
+import Alert from "@components/Alert";
+import Item from "@components/Item";
+import Price from "@components/Price";
+import PrimaryButton from "@components/PrimaryButton";
+import Select from "@components/Select";
+import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
+import { calculateFloatPrice } from "~/lib/priceCalc";
+import { createRecipePath } from "~/lib/recipePath";
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import { RecipeContext, type RecipeRecord } from "./RecipeCard";
 
 const mapRecipes = (
   item: ItemFindUniqueOutput | undefined,
@@ -26,7 +27,7 @@ const mapRecipes = (
   );
   return item.recipes[recipeIdx === -1 ? 0 : recipeIdx]?.ingredients.map(
     (ingredient) => (
-      <Recipe
+      <RecipeCardTree
         key={ingredient.id}
         // @ts-ignore
         item={ingredient.item}
@@ -37,13 +38,13 @@ const mapRecipes = (
   );
 };
 
-interface RecipeProps {
+interface RecipeCardTreeProps {
   item: ItemFindUniqueOutput;
   recipePath: string;
   depth: number;
 }
 
-const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
+const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
@@ -187,7 +188,7 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
               className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
             >
               {price === 0 && (
-                <RecipeAlert
+                <Alert
                   message={"Item is not available\n on the market"}
                 />
               )}
@@ -229,4 +230,4 @@ const Recipe: React.FC<RecipeProps> = ({ item, recipePath, depth }) => {
   );
 };
 
-export default Recipe;
+export default RecipeCardTree;

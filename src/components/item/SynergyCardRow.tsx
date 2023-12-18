@@ -1,15 +1,18 @@
+import { groupBy, toArray, sortBy } from "lodash";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "react-feather";
-import Item from "./Item";
-import { groupBy, toArray, sortBy } from "lodash";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 
-interface SynergyProps {
+import Item from "@components/Item";
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+
+
+interface SynergyCardRowProps {
   name: string;
   synergyItems: NonNullable<ItemFindUniqueOutput>["itemSynergies"][number]["synergy"]["synergyItems"];
 }
 
-const Synergy: React.FC<SynergyProps> = ({ name, synergyItems }) => {
+const SynergyCardRow: React.FC<SynergyCardRowProps> = ({ name, synergyItems }) => {
   const [expanded, setExpanded] = useState(false);
 
   const synergyItemsByCategory = toArray(
@@ -53,4 +56,4 @@ const Synergy: React.FC<SynergyProps> = ({ name, synergyItems }) => {
   );
 };
 
-export default Synergy;
+export default SynergyCardRow;

@@ -1,6 +1,6 @@
 import { isString } from 'lodash';
 import React from 'react';
-import { Icon } from 'react-feather';
+import { type Icon } from 'react-feather';
 
 interface IconButtonProps {
     Content: string | Icon;

@@ -1,19 +1,20 @@
-import Item from "./Item";
-import { useContext, useState } from "react";
-import { BOM_Record, RecipeContext, resourceIds } from "./RecipeCard";
-import PrimaryButton from "./PrimaryButton";
-import Price from "./Price";
-import { calculateFloatPrice } from "~/lib/priceCalc";
-import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
-import RecipeAlert from "./RecipeAlert";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
 import { useTranslation } from "next-i18next";
+import { useContext, useState } from "react";
 
-interface RecipeBomProps {
-  bomRecord: BOM_Record;
+import Alert from "@components/Alert";
+import Item from "@components/Item";
+import Price from "@components/Price";
+import PrimaryButton from "@components/PrimaryButton";
+import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
+import { calculateFloatPrice } from "~/lib/priceCalc";
+
+import { type BOMRecord, RecipeContext } from "./RecipeCard";
+
+interface RecipeCardBOMRowProps {
+  bomRecord: BOMRecord;
 }
 
-const RecipeBOM: React.FC<RecipeBomProps> = ({ bomRecord }) => {
+const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const isMediumDevice = useIsMediumDevice();
@@ -76,7 +77,7 @@ const RecipeBOM: React.FC<RecipeBomProps> = ({ bomRecord }) => {
             className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
           >
             {price === 0 && (
-              <RecipeAlert message={"Item is not available\n on the market"} />
+              <Alert message={"Item is not available\n on the market"} />
             )}
             <input
               type="text"
@@ -127,4 +128,4 @@ const RecipeBOM: React.FC<RecipeBomProps> = ({ bomRecord }) => {
   );
 };
 
-export default RecipeBOM;
+export default RecipeCardBOMRow;

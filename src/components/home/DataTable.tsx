@@ -1,5 +1,22 @@
 'use client';
 import {
+    useReactTable,
+    getCoreRowModel,
+    type SortingState,
+    getSortedRowModel,
+    flexRender,
+    type VisibilityState,
+    type ColumnFiltersState,
+    getFilteredRowModel,
+    type Table,
+    type HeaderGroup,
+    type PaginationState,
+    getPaginationRowModel,
+} from '@tanstack/react-table';
+import { uniq } from 'lodash';
+import { useTranslation } from "next-i18next";
+import React, { useState } from 'react';
+import {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
@@ -8,29 +25,15 @@ import {
     ChevronsRight,
     Search,
 } from 'react-feather';
-import rarityStyles from '../../lib/rarityStyles';
-import {
-    useReactTable,
-    getCoreRowModel,
-    SortingState,
-    getSortedRowModel,
-    flexRender,
-    VisibilityState,
-    ColumnFiltersState,
-    getFilteredRowModel,
-    Table,
-    HeaderGroup,
-    PaginationState,
-    getPaginationRowModel,
-} from '@tanstack/react-table';
-import TextField from './TextField';
-import DebouncedInput from './DebouncedInput';
+
+import rarityStyles from '~/lib/rarityStyles';
+
 import CategoryButton from './CategoryButton';
-import React, { useState } from 'react';
-import { uniq } from 'lodash';
+import DebouncedInput from './DebouncedInput';
 import IconButton from './IconButton';
 import RarityButton from './RarityButton';
-import { useTranslation } from "next-i18next";
+import TextField from './TextField';
+
 
 export interface CategoryData {
     categories: Category[];
@@ -93,8 +96,6 @@ const CategoryFilter = ({
             }
         }
     };
-
-    console.log(data.categories)
 
     const buttons = [
         ...data.categories

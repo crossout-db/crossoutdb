@@ -1,7 +1,9 @@
-import { ChevronRight } from "react-feather";
-import Synergy from "./Synergy";
 import { useTranslation } from "next-i18next";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import SynergyCardRow from "./SynergyCardRow";
+
 
 interface SynergyCardProps {
     data: ItemFindUniqueOutput;
@@ -16,7 +18,7 @@ const SynergyCard: React.FC<SynergyCardProps> = ({ data }) => {
             <h1 className="text-2xl">{t("fields.synergy")}</h1>
         </div>
         <div className="space-y-2">
-            {synergies?.map(synergy => <Synergy key={synergy.synergy.id} name={synergy.synergy.name} synergyItems={synergy.synergy.synergyItems} />)}
+            {synergies?.map(synergy => <SynergyCardRow key={synergy.synergy.id} name={synergy.synergy.name} synergyItems={synergy.synergy.synergyItems} />)}
         </div>
     </div>
 }

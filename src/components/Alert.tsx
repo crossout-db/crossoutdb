@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { AlertTriangle } from "react-feather";
 
-interface RecipeAlertProps {
+interface AlertProps {
     message: string;
 }
 
-const RecipeAlert = ({message}: RecipeAlertProps) => {
+const Alert = ({message}: AlertProps) => {
     const [tooltipActive, setTooltipActive] = useState(false);
 
     return (<>
@@ -17,4 +17,4 @@ const RecipeAlert = ({message}: RecipeAlertProps) => {
     );
 };
 
-export default RecipeAlert;
+export default Alert;

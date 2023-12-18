@@ -1,20 +1,20 @@
-import Recipe from "./Recipe";
+import { useTranslation } from "next-i18next";
 import {
-  Dispatch,
-  SetStateAction,
   createContext,
   useEffect,
   useState,
+  type Dispatch,
+  type SetStateAction,
 } from "react";
-import _, { min } from "lodash";
-import PrimaryButton from "./PrimaryButton";
-import { createRecipePath } from "~/lib/recipePath";
-import RecipeSummary from "./RecipeSummary";
-import { useTranslation } from "next-i18next";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import PrimaryButton from "@components/PrimaryButton";
 import { minGrZero } from "~/lib/minGrZero";
-import RecipeBOM from "./RecipeBOM";
-import Price from "./Price";
+import { createRecipePath } from "~/lib/recipePath";
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import RecipeCardBOMRow from "./RecipeCardBOMRow";
+import RecipeCardSummary from "./RecipeCardSummary";
+import RecipeCardTree from "./RecipeCardTree";
 
 export type RecipeRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
@@ -30,7 +30,7 @@ export type RecipeRecord = {
   action: "nothing" | "custom" | "craft" | "buy" | "sell";
 };
 
-export type BOM_Record = {
+export type BOMRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
   craftCost: number;
   buyPriceMax: number;
@@ -42,9 +42,9 @@ export type BOM_Record = {
 
 export interface RecipeContextData {
   recipeRecords: RecipeRecord[];
-  bomRecords: BOM_Record[];
+  bomRecords: BOMRecord[];
   setRecipeRecords: Dispatch<SetStateAction<RecipeRecord[]>>;
-  setBomRecords: Dispatch<SetStateAction<BOM_Record[]>>;
+  setBomRecords: Dispatch<SetStateAction<BOMRecord[]>>;
 }
 
 export const RecipeContext = createContext<RecipeContextData | undefined>(
@@ -130,10 +130,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
   const [recipeRecords, setRecipeRecords] = useState(
     mapRecipesRecursive(data, 1, true, ""),
   );
-  const [bomRecords, setBomRecords] = useState<BOM_Record[]>([]);
+  const [bomRecords, setBomRecords] = useState<BOMRecord[]>([]);
 
   useEffect(() => {
-    setBomRecords(getBOM_Records(recipeRecords));
+    setBomRecords(getBOMRecords(recipeRecords));
   }, [recipeRecords]);
 
   const sortedBomRecords = [...bomRecords].sort(
@@ -176,7 +176,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
       >
         <div className="space-y-2">
-          <Recipe item={data} recipePath="" depth={0} />
+          <RecipeCardTree item={data} recipePath="" depth={0} />
         </div>
       </RecipeContext.Provider>
 
@@ -189,10 +189,13 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
       >
         <div className="space-y-2">
           {sortedBomRecords.map((bomRecord) => (
-            <RecipeBOM key={bomRecord.condensedItem.id} bomRecord={bomRecord} />
+            <RecipeCardBOMRow
+              key={bomRecord.condensedItem.id}
+              bomRecord={bomRecord}
+            />
           ))}
         </div>
-        <RecipeSummary />
+        <RecipeCardSummary />
       </RecipeContext.Provider>
     </div>
   );
@@ -200,7 +203,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
 
 export default RecipeCard;
 
-function getBOM_Records(recipeRecords: RecipeRecord[]) {
+function getBOMRecords(recipeRecords: RecipeRecord[]) {
   const activeItems = recipeRecords.filter((x) => x.action === "buy");
   const aggregateItems = activeItems.reduce((acc, row) => {
     const existingItem = acc.find(
@@ -221,7 +224,7 @@ function getBOM_Records(recipeRecords: RecipeRecord[]) {
       acc.push(newRow);
     }
     return acc;
-  }, [] as BOM_Record[]);
+  }, [] as BOMRecord[]);
   aggregateItems.forEach((x) => {
     x.totalCost = x.quantity * x.price;
   });

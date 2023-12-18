@@ -19,9 +19,18 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@components": [
+        "src/components"
+      ],
+      "@server/*": [
+        "src/server/*"
+      ],
       "@server": [
         "src/server"
-      ]
+      ],
     },
     "plugins": [{ "name": "next" }]
   },

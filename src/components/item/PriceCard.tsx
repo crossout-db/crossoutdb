@@ -1,8 +1,9 @@
-import { calculateProfit, calculateROI } from "~/lib/priceCalc";
-import Price from "./Price";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTranslation } from "next-i18next";
+
+import Price from "@components/Price";
+import { calculateProfit, calculateROI } from "~/lib/priceCalc";
 
 interface PriceCardProps {
     sellPrice: number;

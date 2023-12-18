@@ -1,13 +1,15 @@
-import { useCurrentUser } from "../lib/context";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { GetServerSideProps, type NextPage } from "next";
-import { getServerSideTranslations } from "~/lib/getServerTranslations";
-import { useTranslation } from "next-i18next";
-import MarketTable from "~/components/crossoutstyle/MarketTable";
-import { uniqBy } from "lodash";
-import { trpc } from "~/lib/trpc";
 import { Prisma } from "@prisma/client";
+import { uniqBy } from "lodash";
+import { type GetServerSideProps, type NextPage } from "next";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
+
+import MarketTable from "@components/home/MarketTable";
+import { useCurrentUser } from "~/lib/context";
+import { getServerSideTranslations } from "~/lib/getServerTranslations";
+import { trpc } from "~/lib/trpc";
+
 
 type Props = {
   // Add custom props here

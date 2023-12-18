@@ -1,10 +1,13 @@
-import DataTable, { type CategoryData, type RarityData } from "./DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import Item from "./Item";
-import Price from "./Price";
-import { useMemo } from "react";
 import { useTranslation } from "next-i18next";
+import { useMemo } from "react";
+
+import Item from "@components/Item";
+import Price from "@components/Price";
 import { type ItemFindManyWithMarketOutput } from "~/pages/index";
+
+import DataTable, { type CategoryData, type RarityData } from "./DataTable";
+
 
 // Define the props
 interface MarketTableProps {

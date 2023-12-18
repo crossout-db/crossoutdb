@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client";
-import { GetServerSideProps } from "next";
+import { type GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import React from "react";
-import PackCard from "~/components/PackCard";
+
+import PackCard from "@components/packs/PackCard";
 import { getServerSideTranslations } from "~/lib/getServerTranslations";
 import { trpc } from "~/lib/trpc";
 

@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import ProgressBar from "./ProgressBar";
 import { useTranslation } from "next-i18next";
-import { ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
+
+import ProgressBar from "./ProgressBar";
 
 interface StatsCardProps {
     data: ItemFindUniqueOutput;
