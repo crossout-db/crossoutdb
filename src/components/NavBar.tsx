@@ -40,12 +40,13 @@ const NavBar: React.FC = ({}) => {
     // },
     {
       name: t("pages.navbar.user.signOut"),
+      href: null,
       onClick: () => void signOut(),
     },
   ];
 
-  if (currentUser?.role === "ADMIN")
-    userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
+//   if (currentUser?.role === "ADMIN")
+//     userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
 
   return (
     <nav className="bg-neutral-800 drop-shadow">
