@@ -154,12 +154,56 @@ const MarketTable: React.FC<MarketTableProps> = ({
       }),
       columnHelper.accessor(
         (row) => {
+          const craftCost = row.craftCost ?? 0;
+          const buyPrice = row.buyPriceMax ?? 0;
+          return (
+            craftCost && buyPrice && buyPrice - craftCost - buyPrice * 0.1
+          );
+        },
+        
+        {
+          id: "craftProfit",
+          header: t("fields.craftProfit"),
+          cell: (props) => {
+            const val = props.getValue();
+            return val !== undefined ? (
+              <Price className="justify-end" value={val} />
+            ) : (
+              "N/A"
+            );
+          },
+          enableGlobalFilter: false,
+        },
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const craftCost = row.craftCost ?? 0;
+          const buyPrice = row.buyPriceMax ?? 0;
+          return (
+            craftCost &&
+            buyPrice &&
+            infToZero((buyPrice - craftCost - buyPrice * 0.1) / craftCost) * 100
+          );
+        },
+        {
+          id: "craftRoi",
+          header: t("fields.craftRoi"),
+          cell: (props) => {
+            const val = props.getValue();
+            return val !== undefined ? val.toFixed(2) + "%" : "N/A";
+          },
+          enableGlobalFilter: false,
+        },
+      ),
+      columnHelper.accessor(
+        (row) => {
           const sellPrice = row.sellPriceMin ?? 0;
           const buyPrice = row.buyPriceMax ?? 0;
           return (
             sellPrice && buyPrice && sellPrice - buyPrice - sellPrice * 0.1
           );
         },
+        
         {
           id: "profit",
           header: t("fields.profit"),

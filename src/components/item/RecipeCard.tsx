@@ -19,6 +19,8 @@ import RecipeCardTree from "./RecipeCardTree";
 export type RecipeRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
   recipePath: string;
+  parentPath: string;
+  parentRecipeId: number | undefined;
   selectedRecipeId: number | undefined;
   craftCost: number;
   buyPriceMax: number;
@@ -57,10 +59,12 @@ interface RecipeCardProps {
 
 export const resourceIds = [2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877];
 const mapRecipesRecursive = (
+  lang: string,
   item: ItemFindUniqueOutput,
   ingredientQty: number,
+  parentPath: string,
   parentActive: boolean,
-  recipePath: string,
+  parentRecipeId?: number,
 ): RecipeRecord[] => {
   if (!item) return [];
 
@@ -74,12 +78,14 @@ const mapRecipesRecursive = (
       recipeIdx = 1;
     }
   }
-  const craftCost = item.recipes[recipeIdx]?.craftCost ?? 0;
+  const recipePath = createRecipePath(parentPath, item.id);
+  const selectedRecipeId = item.recipes[recipeIdx]?.id;
+  const craftCost = (item.recipes[recipeIdx]?.craftCost ?? 0) / (item.recipes[recipeIdx]?.quantity ?? 1)
   const buyPriceMax = item.buyPriceMax ?? 0;
   const sellPriceMin = item.sellPriceMin ?? 0;
-  const price = minGrZero([buyPriceMax, craftCost]);
+  const price = minGrZero([sellPriceMin, craftCost]);
   const craftCostSelected =
-    price === craftCost && !resourceIds.includes(item.id)
+    price === craftCost && craftCost !== 0 && !resourceIds.includes(item.id)
       ? parentActive
       : false;
 
@@ -94,11 +100,15 @@ const mapRecipesRecursive = (
     {
       condensedItem: {
         id: item.id,
-        name: item.name,
+        name:
+          item.translations?.find((tf) => tf.languageCode === lang)?.value ??
+          item.name,
         rarityId: item.rarityId,
       },
-      recipePath: createRecipePath(recipePath, item.id),
-      selectedRecipeId: item.recipes[recipeIdx]?.id,
+      recipePath: recipePath,
+      parentPath: parentPath,
+      parentRecipeId: parentRecipeId,
+      selectedRecipeId: selectedRecipeId,
       craftCost: craftCost,
       buyPriceMax: buyPriceMax,
       sellPriceMin: sellPriceMin,
@@ -112,11 +122,13 @@ const mapRecipesRecursive = (
       .map((recipe) =>
         recipe.ingredients.map((ingredient) =>
           mapRecipesRecursive(
+            lang,
             // @ts-ignore
             ingredient.item,
             ingredient.quantity,
+            recipePath,
             craftCostSelected,
-            createRecipePath(recipePath, item.id),
+            recipe.id,
           ),
         ),
       )
@@ -126,9 +138,10 @@ const mapRecipesRecursive = (
 };
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const [recipeRecords, setRecipeRecords] = useState(
-    mapRecipesRecursive(data, 1, true, ""),
+    mapRecipesRecursive(lang, data, 1, "", true),
   );
   const [bomRecords, setBomRecords] = useState<BOMRecord[]>([]);
 
@@ -141,6 +154,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
   );
 
   if (!data) return <></>;
+
+  const json = JSON.stringify(recipeRecords, null, 2);
 
   return (
     <div className="space-y-2 text-white">
@@ -172,6 +187,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         <span>Buy Price Max</span>
         <span>Sell Price Min</span>
       </div>
+      {/* <span className="text-xs">{json}</span> */}
       <RecipeContext.Provider
         value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
       >
@@ -195,7 +211,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
             />
           ))}
         </div>
-        <RecipeCardSummary />
+        <RecipeCardSummary item={data} recipeQty={recipeRecords[0]?.recipeQty ?? 1} />
       </RecipeContext.Provider>
     </div>
   );

@@ -13,6 +13,7 @@ import { createRecipePath } from "~/lib/recipePath";
 import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 import { RecipeContext, type RecipeRecord } from "./RecipeCard";
+import { minGrZero } from "~/lib/minGrZero";
 
 const mapRecipes = (
   item: ItemFindUniqueOutput | undefined,
@@ -44,7 +45,11 @@ interface RecipeCardTreeProps {
   depth: number;
 }
 
-const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth }) => {
+const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
+  item,
+  recipePath,
+  depth,
+}) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
@@ -66,16 +71,21 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
       if (!newActive) {
         // Find child recipes to set as inactive/collapsed and action to "nothing" if parent collapses
         childRecipes = recipeContext?.recipeRecords
-          .filter((x) => x.recipePath.includes(recipeState.recipePath + "_"))
-          .map((x) => ({ ...x, active: false, action: "nothing" }));
+          .filter((x) => x.recipePath.startsWith(recipeState.recipePath))
+          .map((x) => {
+            if (x.recipePath === recipeState.recipePath)
+              return { ...x, active: false, action: "buy" };
+            return { ...x, active: false, action: "nothing" };
+          });
       }
       if (newActive) {
-        // Set first child recipe action to "buy"
-        // TODO: doesn't work correctly. a recipe can have more than one direct child
-        const buyRecipe = recipeContext?.recipeRecords
-          .filter((x) => x.recipePath.includes(recipeState.recipePath + "_"))
-          .sort((a, b) => a.recipePath.length - b.recipePath.length)[0];
-        if (buyRecipe) childRecipes = [{ ...buyRecipe, action: "buy" }];
+        childRecipes = recipeContext?.recipeRecords
+          .filter(
+            (x) =>
+              x.parentPath === recipeState.recipePath &&
+              x.parentRecipeId === recipeState.selectedRecipeId,
+          )
+          .map((x) => ({ ...x, active: false, action: "buy" }));
       }
       // Build new state
       recipeContext.setRecipeRecords([
@@ -93,12 +103,33 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
 
   const changeRecipe = (newRecipeId: number, craftCost: number) => {
     if (recipeState && recipeContext) {
+      const childRecipes: RecipeRecord[] = recipeContext?.recipeRecords
+        .filter((x) => x.recipePath.startsWith(recipeState.recipePath + "_"))
+        .map((x) => {
+          if (
+            x.parentPath === recipeState.recipePath &&
+            x.parentRecipeId === recipeState.selectedRecipeId
+          )
+            return { ...x, active: false, action: "nothing" };
+          if (
+            x.parentPath === recipeState.recipePath &&
+            x.parentRecipeId === newRecipeId
+          )
+            return { ...x, active: false, action: "buy" };
+          return { ...x, active: false, action: "nothing" };
+        });
       // Build new state
       recipeContext.setRecipeRecords([
-        { ...recipeState, selectedRecipeId: newRecipeId, craftCost },
+        {
+          ...recipeState,
+          selectedRecipeId: newRecipeId,
+          craftCost,
+          price: minGrZero([buyPriceMax, craftCost]),
+        },
+        ...childRecipes,
         ...recipeContext?.recipeRecords.filter((x) => {
-          if (x.recipePath === recipeState.recipePath) return false;
-          return true;
+          if (!x.recipePath.startsWith(recipeState.recipePath + "_"))
+            return true;
         }),
       ]);
     }
@@ -145,10 +176,7 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
             <></>
           )}
           <Item
-            name={
-              item.translations?.find((tf) => tf.languageCode === lang)
-                ?.value ?? item.name
-            }
+            name={recipeState?.condensedItem.name ?? item.name}
             id={item.id}
             rarityId={item.rarityId}
             size="small"
@@ -161,7 +189,11 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
                 value: recipe.id,
               }))}
               onChange={(selectedEntry) =>
-                changeRecipe(selectedEntry.value as number, item.recipes.find(x => x.id === selectedEntry.value)?.craftCost ?? 0)
+                changeRecipe(
+                  selectedEntry.value as number,
+                  item.recipes.find((x) => x.id === selectedEntry.value)
+                    ?.craftCost ?? 0,
+                )
               }
               defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
             />
@@ -172,7 +204,9 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
           style={isMediumDevice ? { marginLeft: depth * indentMultiplier } : {}}
         >
           {hasRecipe && expanded ? (
-            <span>{`Craft recipe needs [ ${recipeState?.ingredientQty} ] and each recipe makes [ ${recipeState?.recipeQty} ], craft [ ${recipeState?.ingredientQty/recipeState?.recipeQty} ] `}</span>
+            <span>{`Craft recipe needs [ ${recipeState?.ingredientQty} ] and each recipe makes [ ${recipeState?.recipeQty} ], craft [ ${
+              recipeState?.ingredientQty / recipeState?.recipeQty
+            } ] `}</span>
           ) : (
             <div className="flex flex-row items-center space-x-1">
               <span>{`Buy [ ${recipeState?.ingredientQty} ] for`}</span>
@@ -184,45 +218,43 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({ item, recipePath, depth
         <div
           style={isMediumDevice ? { marginLeft: depth * indentMultiplier } : {}}
         >
-            <div
-              className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
+          <div
+            className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
+          >
+            {price === 0 && (
+              <Alert message={"Item is not available\n on the market"} />
+            )}
+            <PrimaryButton
+              disabled={craftCost === 0}
+              onClick={() => {
+                changePrice(craftCost);
+                setCustomPrice(calculateFloatPrice(craftCost).toFixed(2));
+              }}
+              active={price !== 0 && price === craftCost}
             >
-              {price === 0 && (
-                <Alert
-                  message={"Item is not available\n on the market"}
-                />
-              )}
-              <PrimaryButton
-                disabled={craftCost === 0}
-                onClick={() => {
-                  changePrice(craftCost);
-                  setCustomPrice(calculateFloatPrice(craftCost).toFixed(2));
-                }}
-                active={price !== 0 && price === craftCost}
-              >
-                <Price value={craftCost} />
-              </PrimaryButton>
-              <PrimaryButton
-                disabled={buyPriceMax === 0}
-                onClick={() => {
-                  changePrice(buyPriceMax);
-                  setCustomPrice(calculateFloatPrice(buyPriceMax).toFixed(2));
-                }}
-                active={price !== 0 && price === buyPriceMax}
-              >
-                <Price value={buyPriceMax} />
-              </PrimaryButton>
-              <PrimaryButton
-                disabled={sellPriceMin === 0}
-                onClick={() => {
-                  changePrice(sellPriceMin);
-                  setCustomPrice(calculateFloatPrice(sellPriceMin).toFixed(2));
-                }}
-                active={price !== 0 && price === sellPriceMin}
-              >
-                <Price value={sellPriceMin} />
-              </PrimaryButton>
-            </div>
+              <Price value={craftCost} />
+            </PrimaryButton>
+            <PrimaryButton
+              disabled={buyPriceMax === 0}
+              onClick={() => {
+                changePrice(buyPriceMax);
+                setCustomPrice(calculateFloatPrice(buyPriceMax).toFixed(2));
+              }}
+              active={price !== 0 && price === buyPriceMax}
+            >
+              <Price value={buyPriceMax} />
+            </PrimaryButton>
+            <PrimaryButton
+              disabled={sellPriceMin === 0}
+              onClick={() => {
+                changePrice(sellPriceMin);
+                setCustomPrice(calculateFloatPrice(sellPriceMin).toFixed(2));
+              }}
+              active={price !== 0 && price === sellPriceMin}
+            >
+              <Price value={sellPriceMin} />
+            </PrimaryButton>
+          </div>
         </div>
       </div>
       {expanded && mapRecipes(item, recipePath, recipeState, depth + 1)}

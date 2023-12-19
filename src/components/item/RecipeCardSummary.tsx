@@ -1,17 +1,22 @@
 import { useContext } from "react";
 
 import Price from "@components/Price";
+import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 import { RecipeContext } from "./RecipeCard";
 
-interface RecipeCardSummaryProps {}
 
-const RecipeCardSummary: React.FC<RecipeCardSummaryProps> = ({}) => {
-  const bomContext = useContext(RecipeContext);
+interface RecipeCardSummaryProps {
+    item: ItemFindUniqueOutput;
+    recipeQty: number;
+}
 
-  if (!bomContext) return <></>;
+const RecipeCardSummary: React.FC<RecipeCardSummaryProps> = ({ item, recipeQty }) => {
+  const recipeContext = useContext(RecipeContext);
 
-  const totalCost = bomContext.bomRecords.reduce(
+  if (!recipeContext) return <></>;
+
+  const totalCost = recipeContext.bomRecords.reduce(
     (acc, curr) => acc + curr.totalCost,
     0,
   );
@@ -27,7 +32,9 @@ const RecipeCardSummary: React.FC<RecipeCardSummaryProps> = ({}) => {
         >
           <span className="border border-xoPrimary bg-black px-2 text-right text-white hover:border-white focus:border-xoQuaternary focus:shadow focus:shadow-orange-500 focus:outline-none">
             <Price value={totalCost} />
+            
           </span>
+          {recipeQty > 1 && <span> / {recipeQty} recipe quantity</span>}
         </div>
         <div
           className={`flex flex-row items-center justify-start space-x-2 bg-neutral-800 p-2`}

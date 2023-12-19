@@ -29,11 +29,11 @@ export interface ICalcCraftingCostsError {
 
 export async function CalcCraftingCosts() {
   const currentMarket = await db.market.findMany({
-    where: {
-      timestamp: {
-        gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      },
-    },
+    // where: {
+    //   timestamp: {
+    //     gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    //   },
+    // },
     orderBy: {
       timestamp: "desc",
     },
@@ -199,4 +199,3 @@ export async function CalcCraftingCosts() {
 
   return { recipeCraftCosts, itemCraftCosts, errors };
 }
-
