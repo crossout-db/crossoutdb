@@ -14,7 +14,6 @@ import {
   type PaginationState,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { uniq } from "lodash";
 import { useTranslation } from "next-i18next";
 import React, { useState } from "react";
 import {
@@ -30,7 +29,7 @@ import {
 import rarityStyles from "~/lib/rarityStyles";
 
 import DebouncedInput from "./DebouncedInput";
-import IconButton from "./IconButton";
+import TableButton from "./TableButton";
 import { CategoryFilter, RarityFilter } from "./TableButtons";
 import TextField from "./TextField";
 
@@ -108,11 +107,12 @@ const DataTable = ({
   );
   for (let i = prevBtnMin; i < nextBtnMax; i++) {
     pageButtons.push(
-      <IconButton
+      <TableButton
         key={i + 1}
         size="large"
         active={currentPageIndex === i}
         Content={(i + 1).toString()}
+        type="text"
         onClick={() => setPageIndex(i)}
       />,
     );
@@ -137,10 +137,7 @@ const DataTable = ({
           />
         )}
         {rarities && (
-          <RarityFilter
-            column={table.getColumn("rarityId")}
-            data={rarities}
-          />
+          <RarityFilter column={table.getColumn("rarityId")} data={rarities} />
         )}
       </div>
       <table className="table w-full border-separate border-spacing-y-2 text-white">
@@ -209,33 +206,33 @@ const DataTable = ({
         </tbody>
       </table>
       <div className="float-right space-x-1">
-        <IconButton
-          size={"large"}
-          disabled={currentPageIndex === 0}
-          icon
-          Content={ChevronsLeft}
-          onClick={() => setPageIndex(0)}
-        />
-        <IconButton
+        <TableButton
           size={"large"}
           disabled={!getCanPreviousPage()}
-          icon
+          Content={ChevronsLeft}
+          type="Icon"
+          onClick={() => setPageIndex(0)}
+        />
+        <TableButton
+          size={"large"}
+          disabled={!getCanPreviousPage()}
           Content={ChevronLeft}
+          type="Icon"
           onClick={previousPage}
         />
         {pageButtons}
-        <IconButton
+        <TableButton
           size={"large"}
           disabled={!getCanNextPage()}
-          icon
           Content={ChevronRight}
+          type="Icon"
           onClick={nextPage}
         />
-        <IconButton
+        <TableButton
           size={"large"}
-          disabled={currentPageIndex === getPageCount() - 1}
-          icon
+          disabled={!getCanNextPage()}
           Content={ChevronsRight}
+          type="Icon"
           onClick={() => setPageIndex(getPageCount() - 1)}
         />
       </div>
