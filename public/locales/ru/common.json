@@ -79,6 +79,24 @@
         "info": "Возможно, вы забыли добавить {{action}} компонент для {{resource}} ресурс.",
         "resource404": "Вы уверены, что создали {{resource}} ресурс.",
         "backHome": "Домой"
+      },
+      "item": {
+        "recipe": {
+          "title": "Рецепт",
+          "customPrice": "Пользовательская цена",
+          "craftCost": "Стоимость изготовления",
+          "buyPrice": "Цена покупки",
+          "sellPrice": "Цена продажи",
+          "purchase": "Покупка",
+          "for": "для",
+          "each": "каждый",
+          "recipeRequires": "Для рецепта требуется",
+          "recipeMakes": "рецепт делает",
+          "craft": "Ремесло",
+          "cart": "Корзина",
+          "recipeQty": "количество рецепта",
+          "totalCost": "Общая стоимость:"
+        }
       }
     },
     "actions": {
@@ -102,7 +120,9 @@
       "undo": "Отменить",
       "import": "Импортировать",
       "clone": "Клонировать",
-      "notAccessTitle": "У вас нет разрешения на доступ"
+      "notAccessTitle": "У вас нет разрешения на доступ",
+      "expandAll": "Расширить все",
+      "collapseAll": "Свернуть все"
     },
     "warnWhenUnsavedChanges": "Вы уверены, что хотите выйти? ",
     "notifications": {
@@ -151,10 +171,10 @@
       "actions": "Действия"
     },
     "language": {
-      "en": "English",
-      "de": "Deutsch",
-      "ru": "Русский",
-      "zh": "中文"
+        "en": "English",
+        "de": "Deutsch",
+        "ru": "Русский",
+        "zh": "中文"
     },
     "fields": {
       "id": "ИДЕНТИФИКАТОР",
@@ -258,6 +278,27 @@
       "translations": "Переводы"
     },
     "db": {
+      "recipe": {
+        "Recipe_Primary": "Начальный",
+        "Recipe_0278_Coupons_x10": "Купоны х10",
+        "Recipe_0279_Coupons_x100": "Купоны х100",
+        "Recipe_0280_Scrap_x100": "Лом x100",
+        "Recipe_0281_Scrap_x1000": "Лом x1000",
+        "Recipe_0282_Copper_x100": "Медь x100",
+        "Recipe_0283_Copper_x1000": "Медь x1000",
+        "Recipe_0284_Wires_x100": "Провода х100",
+        "Recipe_0285_Wires_x1000": "Провода х1000",
+        "Recipe_0286_Plastic_x100": "Пластик х100",
+        "Recipe_0287_Plastic_x1000": "Пластик х1000",
+        "Recipe_0288_Batteries_x10": "Батарейки х10",
+        "Recipe_0289_Batteries_x100": "Батарейки х100",
+        "Recipe_0290_Electronics_x10": "Электроника х10",
+        "Recipe_0291_Electronics_x100": "Электроника х100",
+        "Recipe_0292_Uranium_ore_x10": "Урановая руда x10",
+        "Recipe_0293_Uranium_ore_x100": "Урановая руда x100",
+        "Recipe_0294_Fuel_x100": "Топливо х100",
+        "Recipe_0295_Fuel_x1000": "Топливо x1000"
+      },
       "type": {
         "Type_0001_Activatable_decoration": "Активируемое украшение",
         "Type_0002_Ammunition": "Боеприпасы",

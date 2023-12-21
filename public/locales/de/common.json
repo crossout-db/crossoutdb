@@ -79,6 +79,24 @@
         "info": "Möglicherweise haben Sie vergessen, das hinzuzufügen {{action}} Komponente zu {{resource}} Ressource.",
         "resource404": "Sind Sie sicher, dass Sie das erstellt haben? {{resource}} Ressource.",
         "backHome": "Zurück zuhause"
+      },
+      "item": {
+        "recipe": {
+          "title": "Rezept",
+          "customPrice": "Benutzerdefinierter Preis",
+          "craftCost": "Herstellungskosten",
+          "buyPrice": "Kaufpreis",
+          "sellPrice": "Verkaufspreis",
+          "purchase": "Kaufen",
+          "for": "für",
+          "each": "jede",
+          "recipeRequires": "Rezept erfordert",
+          "recipeMakes": "Rezept macht",
+          "craft": "Handwerk",
+          "cart": "Wagen",
+          "recipeQty": "Rezeptmenge",
+          "totalCost": "Gesamtkosten:"
+        }
       }
     },
     "actions": {
@@ -102,7 +120,9 @@
       "undo": "Rückgängig machen",
       "import": "Importieren",
       "clone": "Klon",
-      "notAccessTitle": "Sie haben keine Zugriffsberechtigung"
+      "notAccessTitle": "Sie haben keine Zugriffsberechtigung",
+      "expandAll": "Alle erweitern",
+      "collapseAll": "Alles einklappen"
     },
     "warnWhenUnsavedChanges": "Bist du sicher dass du gehen willst? ",
     "notifications": {
@@ -151,10 +171,10 @@
       "actions": "Aktionen"
     },
     "language": {
-      "en": "English",
-      "de": "Deutsch",
-      "ru": "Русский",
-      "zh": "中文"
+        "en": "English",
+        "de": "Deutsch",
+        "ru": "Русский",
+        "zh": "中文"
     },
     "fields": {
       "id": "AUSWEIS",
@@ -258,6 +278,27 @@
       "translations": "Übersetzungen"
     },
     "db": {
+      "recipe": {
+        "Recipe_Primary": "Primär",
+        "Recipe_0278_Coupons_x10": "Gutscheine x10",
+        "Recipe_0279_Coupons_x100": "Gutscheine x100",
+        "Recipe_0280_Scrap_x100": "Schrott x100",
+        "Recipe_0281_Scrap_x1000": "Schrott x1000",
+        "Recipe_0282_Copper_x100": "Kupfer x100",
+        "Recipe_0283_Copper_x1000": "Kupfer x1000",
+        "Recipe_0284_Wires_x100": "Drähte x100",
+        "Recipe_0285_Wires_x1000": "Drähte x1000",
+        "Recipe_0286_Plastic_x100": "Kunststoff x100",
+        "Recipe_0287_Plastic_x1000": "Kunststoff x1000",
+        "Recipe_0288_Batteries_x10": "Batterien x10",
+        "Recipe_0289_Batteries_x100": "Batterien x100",
+        "Recipe_0290_Electronics_x10": "Elektronik x10",
+        "Recipe_0291_Electronics_x100": "Elektronik x100",
+        "Recipe_0292_Uranium_ore_x10": "Uranerz x10",
+        "Recipe_0293_Uranium_ore_x100": "Uranerz x100",
+        "Recipe_0294_Fuel_x100": "Treibstoff x100",
+        "Recipe_0295_Fuel_x1000": "Treibstoff x1000"
+      },
       "type": {
         "Type_0001_Activatable_decoration": "Aktivierbare Dekoration",
         "Type_0002_Ammunition": "Munition",

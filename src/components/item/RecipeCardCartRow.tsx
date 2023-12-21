@@ -8,19 +8,19 @@ import PrimaryButton from "@components/PrimaryButton";
 import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
 import { calculateFloatPrice } from "~/lib/priceCalc";
 
-import { type BOMRecord, RecipeContext } from "./RecipeCard";
+import { type CartRecord as CartRecord, RecipeContext } from "./RecipeCard";
 
-interface RecipeCardBOMRowProps {
-  bomRecord: BOMRecord;
+interface RecipeCardCartRowProps {
+  cartRecord: CartRecord;
 }
 
-const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
+const RecipeCardCartRow: React.FC<RecipeCardCartRowProps> = ({ cartRecord }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const isMediumDevice = useIsMediumDevice();
-  const bomContext = useContext(RecipeContext);
-  const bomState = bomContext?.bomRecords.find(
-    (x) => x.condensedItem.id === bomRecord.condensedItem.id,
+  const recipeContext = useContext(RecipeContext);
+  const cartState = recipeContext?.cartRecords.find(
+    (x) => x.condensedItem.id === cartRecord.condensedItem.id,
   );
 
   const [customPrice, setCustomPrice] = useState(
@@ -28,23 +28,23 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
   );
 
   const changePrice = (newPrice: number) => {
-    if (bomState && bomContext) {
+    if (cartState && recipeContext) {
       // Build new state
-      const newTotalCost = newPrice * bomState.quantity;
-      bomContext.setBomRecords([
-        { ...bomState, price: newPrice, totalCost: newTotalCost },
-        ...bomContext.bomRecords.filter(
-          (x) => x.condensedItem.id !== bomRecord.condensedItem.id,
+      const newTotalCost = newPrice * cartState.quantity;
+      recipeContext.setCartRecords([
+        { ...cartState, price: newPrice, totalCost: newTotalCost },
+        ...recipeContext.cartRecords.filter(
+          (x) => x.condensedItem.id !== cartRecord.condensedItem.id,
         ),
       ]);
     }
   };
 
-  const craftCost = bomState?.craftCost ?? 0;
-  const sellPriceMin = bomRecord.sellPriceMin ?? 0;
-  const buyPriceMax = bomRecord.buyPriceMax ?? 0;
-  const price = bomState?.price ?? 0;
-  const totalCost = bomRecord.totalCost ?? 0;
+  const craftCost = cartState?.craftCost ?? 0;
+  const sellPriceMin = cartRecord.sellPriceMin ?? 0;
+  const buyPriceMax = cartRecord.buyPriceMax ?? 0;
+  const price = cartState?.price ?? 0;
+  const totalCost = cartRecord.totalCost ?? 0;
   const sharedStyleClasses = "bg-neutral-800 p-2";
 
   return (
@@ -54,21 +54,28 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
           className={`flex flex-row items-center space-x-2 ${sharedStyleClasses} pl-10`}
         >
           <Item
-            name={bomRecord.condensedItem.name}
-            id={bomRecord.condensedItem.id}
-            rarityId={bomRecord.condensedItem.rarityId}
+            name={cartRecord.condensedItem.name}
+            id={cartRecord.condensedItem.id}
+            rarityId={cartRecord.condensedItem.rarityId}
             size="small"
           />
         </div>
         <div
-          className={`flex flex-row items-center justify-start space-x-2 ${sharedStyleClasses}`}
+          className={`flex flex-row items-center justify-end space-x-2 ${sharedStyleClasses}`}
         >
-          <span>{`Quantity ${bomState?.quantity} x`}</span>
-          <span className="border border-xoPrimary bg-black px-2 text-right text-white hover:border-white focus:border-xoQuaternary focus:shadow focus:shadow-orange-500 focus:outline-none">
+          {price === 0 && (
+            <Alert message={"Item is not available\n on the market"} />
+          )}{" "}
+          <span>{t("fields.quantity")}</span>
+          <span className="flex w-16 items-center justify-end border border-xoPrimary bg-black px-2 py-1 text-right text-white">
+          {cartState?.quantity}
+          </span>
+          <span>x</span>
+          <span className="flex w-28 items-center justify-end border border-xoPrimary bg-black px-2 py-1 text-right text-white">
             <Price value={price} />
           </span>
           <span>=</span>
-          <span className="border border-xoPrimary bg-black px-2 text-right text-white hover:border-white focus:border-xoQuaternary focus:shadow focus:shadow-orange-500 focus:outline-none">
+          <span className="flex w-28 items-center justify-end border border-xoPrimary bg-black px-2 py-1 text-right text-white">
             <Price value={totalCost} />
           </span>
         </div>
@@ -76,9 +83,6 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
           <div
             className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
           >
-            {price === 0 && (
-              <Alert message={"Item is not available\n on the market"} />
-            )}
             <input
               type="text"
               size={8}
@@ -98,6 +102,7 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
                 setCustomPrice(calculateFloatPrice(craftCost).toFixed(2));
               }}
               active={price !== 0 && price === craftCost}
+              justify="end"
             >
               <Price value={craftCost} />
             </PrimaryButton>
@@ -108,6 +113,7 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
                 setCustomPrice(calculateFloatPrice(buyPriceMax).toFixed(2));
               }}
               active={price !== 0 && price === buyPriceMax}
+              justify="end"
             >
               <Price value={buyPriceMax} />
             </PrimaryButton>
@@ -118,6 +124,7 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
                 setCustomPrice(calculateFloatPrice(sellPriceMin).toFixed(2));
               }}
               active={price !== 0 && price === sellPriceMin}
+              justify="end"
             >
               <Price value={sellPriceMin} />
             </PrimaryButton>
@@ -128,4 +135,4 @@ const RecipeCardBOMRow: React.FC<RecipeCardBOMRowProps> = ({ bomRecord }) => {
   );
 };
 
-export default RecipeCardBOMRow;
+export default RecipeCardCartRow;

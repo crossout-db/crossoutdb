@@ -50,7 +50,7 @@ const NavBar: React.FC = ({}) => {
   //     userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
 
   return (
-    <nav className="bg-neutral-800 drop-shadow">
+    <nav className="bg-neutral-800 drop-shadow top-0 z-50 sticky">
       <div className="container mx-auto flex flex-wrap items-center justify-between p-4 space-x-2">
         <a
           href={"/"}

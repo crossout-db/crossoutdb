@@ -12,7 +12,7 @@ import { minGrZero } from "~/lib/minGrZero";
 import { createRecipePath } from "~/lib/recipePath";
 import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
 
-import RecipeCardBOMRow from "./RecipeCardBOMRow";
+import RecipeCardCartRow from "./RecipeCardCartRow";
 import RecipeCardSummary from "./RecipeCardSummary";
 import RecipeCardTree from "./RecipeCardTree";
 
@@ -20,6 +20,7 @@ export type RecipeRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
   recipePath: string;
   parentPath: string;
+  parentRecipeQty: number;
   parentRecipeId: number | undefined;
   selectedRecipeId: number | undefined;
   craftCost: number;
@@ -32,7 +33,7 @@ export type RecipeRecord = {
   action: "nothing" | "custom" | "craft" | "buy" | "sell";
 };
 
-export type BOMRecord = {
+export type CartRecord = {
   condensedItem: { name: string; id: number; rarityId: number };
   craftCost: number;
   buyPriceMax: number;
@@ -44,9 +45,9 @@ export type BOMRecord = {
 
 export interface RecipeContextData {
   recipeRecords: RecipeRecord[];
-  bomRecords: BOMRecord[];
+  cartRecords: CartRecord[];
   setRecipeRecords: Dispatch<SetStateAction<RecipeRecord[]>>;
-  setBomRecords: Dispatch<SetStateAction<BOMRecord[]>>;
+  setCartRecords: Dispatch<SetStateAction<CartRecord[]>>;
 }
 
 export const RecipeContext = createContext<RecipeContextData | undefined>(
@@ -63,6 +64,7 @@ const mapRecipesRecursive = (
   item: ItemFindUniqueOutput,
   ingredientQty: number,
   parentPath: string,
+  parentRecipeQty: number,
   parentActive: boolean,
   parentRecipeId?: number,
 ): RecipeRecord[] => {
@@ -79,8 +81,11 @@ const mapRecipesRecursive = (
     }
   }
   const recipePath = createRecipePath(parentPath, item.id);
+  const recipeQty = item.recipes[recipeIdx]?.quantity ?? 1;
   const selectedRecipeId = item.recipes[recipeIdx]?.id;
-  const craftCost = (item.recipes[recipeIdx]?.craftCost ?? 0) / (item.recipes[recipeIdx]?.quantity ?? 1)
+  const craftCost =
+    (item.recipes[recipeIdx]?.craftCost ?? 0) /
+    (item.recipes[recipeIdx]?.quantity ?? 1);
   const buyPriceMax = item.buyPriceMax ?? 0;
   const sellPriceMin = item.sellPriceMin ?? 0;
   const price = minGrZero([sellPriceMin, craftCost]);
@@ -107,13 +112,14 @@ const mapRecipesRecursive = (
       },
       recipePath: recipePath,
       parentPath: parentPath,
+      parentRecipeQty: parentRecipeQty,
       parentRecipeId: parentRecipeId,
       selectedRecipeId: selectedRecipeId,
       craftCost: craftCost,
       buyPriceMax: buyPriceMax,
       sellPriceMin: sellPriceMin,
       price: price,
-      recipeQty: item.recipes[recipeIdx]?.quantity ?? 0,
+      recipeQty: recipeQty,
       ingredientQty,
       active: craftCostSelected,
       action: action,
@@ -127,6 +133,7 @@ const mapRecipesRecursive = (
             ingredient.item,
             ingredient.quantity,
             recipePath,
+            Math.ceil(ingredientQty / recipeQty),
             craftCostSelected,
             recipe.id,
           ),
@@ -141,15 +148,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [recipeRecords, setRecipeRecords] = useState(
-    mapRecipesRecursive(lang, data, 1, "", true),
+    mapRecipesRecursive(lang, data, 1, "", 1, true),
   );
-  const [bomRecords, setBomRecords] = useState<BOMRecord[]>([]);
+  const [cartRecords, setCartRecords] = useState<CartRecord[]>([]);
 
   useEffect(() => {
-    setBomRecords(getBOMRecords(recipeRecords));
+    setCartRecords(getCartRecords(recipeRecords));
   }, [recipeRecords]);
 
-  const sortedBomRecords = [...bomRecords].sort(
+  const sortedCartRecords = [...cartRecords].sort(
     (a, b) => a.condensedItem.id - b.condensedItem.id,
   );
 
@@ -159,59 +166,100 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
 
   return (
     <div className="space-y-2 text-white">
-      <div className="flex flex-row items-baseline space-x-4 bg-neutral-800 p-4">
-        <h1 className="text-2xl">{t("fields.recipe")}</h1>
-        <PrimaryButton
-          onClick={() =>
-            setRecipeRecords(
-              recipeRecords.map((x) => {
-                if (!resourceIds.includes(x.condensedItem.id))
-                  return { ...x, active: true };
-                return x;
-              }),
-            )
-          }
-        >
-          Expand all
-        </PrimaryButton>
-        <PrimaryButton
-          onClick={() =>
-            setRecipeRecords(
-              recipeRecords.map((x) => ({ ...x, active: false })),
-            )
-          }
-        >
-          Collapse all
-        </PrimaryButton>
-        <span>Craft Cost</span>
-        <span>Buy Price Max</span>
-        <span>Sell Price Min</span>
+      <div className="grid space-x-1 bg-neutral-800 py-4 md:grid-cols-1 lg:grid-cols-3">
+        <div className="flex flex-row items-baseline space-x-4 px-4">
+          <h1 className="text-2xl">{t("pages.item.recipe.title")}</h1>
+          <PrimaryButton
+            onClick={() =>
+              setRecipeRecords(
+                recipeRecords.map((x) => {
+                  if (!resourceIds.includes(x.condensedItem.id))
+                    return { ...x, active: true };
+                  return x;
+                }),
+              )
+            }
+          >
+            {t("buttons.expandAll")}
+          </PrimaryButton>
+          <PrimaryButton
+            onClick={() =>
+              setRecipeRecords(
+                recipeRecords.map((x) => ({ ...x, active: false })),
+              )
+            }
+          >
+            {t("buttons.collapseAll")}
+          </PrimaryButton>
+        </div>
+        <div></div>
+        <div className="flex flex-row justify-end space-x-2 p-2">
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.craftCost")}
+          </span>
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.buyPrice")}
+          </span>
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.sellPrice")}
+          </span>
+        </div>
       </div>
       {/* <span className="text-xs">{json}</span> */}
       <RecipeContext.Provider
-        value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
+        value={{
+          recipeRecords,
+          setRecipeRecords,
+          cartRecords: cartRecords,
+          setCartRecords: setCartRecords,
+        }}
       >
         <div className="space-y-2">
           <RecipeCardTree item={data} recipePath="" depth={0} />
         </div>
       </RecipeContext.Provider>
 
-      <div className="flex flex-row items-baseline space-x-4 bg-neutral-800 p-4">
-        <h1 className="text-2xl">{t("Recipe.BOM")}</h1>
+      <div className="grid space-x-1 bg-neutral-800 py-4 md:grid-cols-1 lg:grid-cols-3">
+        <div className="flex flex-row items-baseline space-x-4 px-4">
+          <h1 className="text-2xl">{t("pages.item.recipe.cart")}</h1>
+        </div>
+        <div></div>
+        <div className="flex flex-row justify-end space-x-2 p-2">
+        <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.customPrice")}
+          </span>
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.craftCost")}
+          </span>
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.buyPrice")}
+          </span>
+          <span className="w-28 px-2 text-center">
+            {t("pages.item.recipe.sellPrice")}
+          </span>
+        </div>
       </div>
 
       <RecipeContext.Provider
-        value={{ recipeRecords, setRecipeRecords, bomRecords, setBomRecords }}
+        value={{
+          recipeRecords,
+          setRecipeRecords,
+          cartRecords: cartRecords,
+          setCartRecords: setCartRecords,
+        }}
       >
         <div className="space-y-2">
-          {sortedBomRecords.map((bomRecord) => (
-            <RecipeCardBOMRow
-              key={bomRecord.condensedItem.id}
-              bomRecord={bomRecord}
+          {sortedCartRecords.map((record) => (
+            <RecipeCardCartRow
+              key={record.condensedItem.id}
+              cartRecord={record}
             />
           ))}
         </div>
-        <RecipeCardSummary item={data} recipeQty={recipeRecords[0]?.recipeQty ?? 1} />
+        <RecipeCardSummary
+          item={data}
+          recipeQty={recipeRecords[0]?.recipeQty ?? 1}
+        />
       </RecipeContext.Provider>
     </div>
   );
@@ -219,14 +267,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
 
 export default RecipeCard;
 
-function getBOMRecords(recipeRecords: RecipeRecord[]) {
+function getCartRecords(recipeRecords: RecipeRecord[]) {
   const activeItems = recipeRecords.filter((x) => x.action === "buy");
   const aggregateItems = activeItems.reduce((acc, row) => {
     const existingItem = acc.find(
       (i) => i.condensedItem.id === row.condensedItem.id,
     );
     if (existingItem) {
-      existingItem.quantity += row.ingredientQty;
+      existingItem.quantity += row.ingredientQty * row.parentRecipeQty;
     } else {
       const newRow = {
         condensedItem: row.condensedItem,
@@ -234,13 +282,13 @@ function getBOMRecords(recipeRecords: RecipeRecord[]) {
         buyPriceMax: row.buyPriceMax,
         sellPriceMin: row.sellPriceMin,
         price: row.price,
-        quantity: row.ingredientQty,
+        quantity: row.ingredientQty * row.parentRecipeQty,
         totalCost: 0,
       };
       acc.push(newRow);
     }
     return acc;
-  }, [] as BOMRecord[]);
+  }, [] as CartRecord[]);
   aggregateItems.forEach((x) => {
     x.totalCost = x.quantity * x.price;
   });

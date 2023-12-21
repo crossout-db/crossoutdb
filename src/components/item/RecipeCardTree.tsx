@@ -182,36 +182,41 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
             size="small"
           />
           {hasMultipleRecipes && (
-            <Select
-              entries={item.recipes.map((recipe) => ({
-                key: recipe.id.toString(),
-                label: "Recipe " + recipe.id,
-                value: recipe.id,
-              }))}
-              onChange={(selectedEntry) =>
-                changeRecipe(
-                  selectedEntry.value as number,
-                  item.recipes.find((x) => x.id === selectedEntry.value)
-                    ?.craftCost ?? 0,
-                )
-              }
-              defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
-            />
+            <div className="flex w-full flex-row justify-end">
+              <Select
+                entries={item.recipes.map((recipe) => ({
+                  key: recipe.id.toString(),
+                  label: t("db.recipe." + recipe.name),
+                  value: recipe.id,
+                }))}
+                onChange={(selectedEntry) =>
+                  changeRecipe(
+                    selectedEntry.value as number,
+                    item.recipes.find((x) => x.id === selectedEntry.value)
+                      ?.craftCost ?? 0,
+                  )
+                }
+                defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
+              />
+            </div>
           )}
         </div>
         <div
           className={`flex flex-row items-center justify-start space-x-2 ${sharedStyleClasses}`}
           style={isMediumDevice ? { marginLeft: depth * indentMultiplier } : {}}
         >
+          {price === 0 && (
+            <Alert message={"Item is not available\n on the market"} />
+          )}
           {hasRecipe && expanded ? (
-            <span>{`Craft recipe needs [ ${recipeState?.ingredientQty} ] and each recipe makes [ ${recipeState?.recipeQty} ], craft [ ${
+            <span>{`${t("pages.item.recipe.recipeRequires")} [ ${recipeState?.ingredientQty} ], ${t("pages.item.recipe.recipeMakes")} [ ${recipeState?.recipeQty} ], ${t("pages.item.recipe.craft")} [ ${
               recipeState?.ingredientQty / recipeState?.recipeQty
             } ] `}</span>
           ) : (
             <div className="flex flex-row items-center space-x-1">
-              <span>{`Buy [ ${recipeState?.ingredientQty} ] for`}</span>
+              <span>{`${t("pages.item.recipe.purchase")} [ ${recipeState?.ingredientQty} ] ${t("pages.item.recipe.for")}`}</span>
               <Price value={recipeState?.price ?? 0} />
-              <span>each</span>
+              <span>{t("pages.item.recipe.each")}</span>
             </div>
           )}
         </div>
@@ -221,9 +226,6 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
           <div
             className={`flex flex-row space-x-2 md:justify-start lg:justify-end ${sharedStyleClasses}`}
           >
-            {price === 0 && (
-              <Alert message={"Item is not available\n on the market"} />
-            )}
             <PrimaryButton
               disabled={craftCost === 0}
               onClick={() => {
@@ -231,6 +233,7 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
                 setCustomPrice(calculateFloatPrice(craftCost).toFixed(2));
               }}
               active={price !== 0 && price === craftCost}
+              justify="end"
             >
               <Price value={craftCost} />
             </PrimaryButton>
@@ -241,6 +244,7 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
                 setCustomPrice(calculateFloatPrice(buyPriceMax).toFixed(2));
               }}
               active={price !== 0 && price === buyPriceMax}
+              justify="end"
             >
               <Price value={buyPriceMax} />
             </PrimaryButton>
@@ -251,6 +255,7 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
                 setCustomPrice(calculateFloatPrice(sellPriceMin).toFixed(2));
               }}
               active={price !== 0 && price === sellPriceMin}
+              justify="end"
             >
               <Price value={sellPriceMin} />
             </PrimaryButton>

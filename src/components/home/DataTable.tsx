@@ -50,7 +50,7 @@ const DataTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 7,
+    pageSize: 6,
   });
 
   const hiddenColumns = columns

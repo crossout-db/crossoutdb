@@ -79,6 +79,24 @@
         "info": "您可能忘记添加 {{action}} 组件到 {{resource}} 资源。",
         "resource404": "您确定您已经创建了 {{resource}} 资源。",
         "backHome": "回家"
+      },
+      "item": {
+        "recipe": {
+          "title": "食谱",
+          "customPrice": "定制价格",
+          "craftCost": "工艺成本",
+          "buyPrice": "购买价格",
+          "sellPrice": "售价",
+          "purchase": "购买",
+          "for": "为了",
+          "each": "每个",
+          "recipeRequires": "食谱要求",
+          "recipeMakes": "食谱使",
+          "craft": "工艺",
+          "cart": "大车",
+          "recipeQty": "配方数量",
+          "totalCost": "总成本："
+        }
       }
     },
     "actions": {
@@ -102,7 +120,9 @@
       "undo": "撤消",
       "import": "进口",
       "clone": "克隆",
-      "notAccessTitle": "您无权访问"
+      "notAccessTitle": "您无权访问",
+      "expandAll": "展开全部",
+      "collapseAll": "全部收缩"
     },
     "warnWhenUnsavedChanges": "您确定要离开吗？",
     "notifications": {
@@ -151,10 +171,10 @@
       "actions": "行动"
     },
     "language": {
-      "en": "English",
-      "de": "Deutsch",
-      "ru": "Русский",
-      "zh": "中文"
+        "en": "English",
+        "de": "Deutsch",
+        "ru": "Русский",
+        "zh": "中文"
     },
     "fields": {
       "id": "ID",
@@ -258,6 +278,27 @@
       "translations": "翻译"
     },
     "db": {
+      "recipe": {
+        "Recipe_Primary": "基本的",
+        "Recipe_0278_Coupons_x10": "优惠券x10",
+        "Recipe_0279_Coupons_x100": "优惠券x100",
+        "Recipe_0280_Scrap_x100": "废料 x100",
+        "Recipe_0281_Scrap_x1000": "废料 x1000",
+        "Recipe_0282_Copper_x100": "铜x100",
+        "Recipe_0283_Copper_x1000": "铜x1000",
+        "Recipe_0284_Wires_x100": "电线 x100",
+        "Recipe_0285_Wires_x1000": "电线 x1000",
+        "Recipe_0286_Plastic_x100": "塑料x100",
+        "Recipe_0287_Plastic_x1000": "塑料x1000",
+        "Recipe_0288_Batteries_x10": "电池 x10",
+        "Recipe_0289_Batteries_x100": "电池 x100",
+        "Recipe_0290_Electronics_x10": "电子产品 x10",
+        "Recipe_0291_Electronics_x100": "电子产品 x100",
+        "Recipe_0292_Uranium_ore_x10": "铀矿石 x10",
+        "Recipe_0293_Uranium_ore_x100": "铀矿石 x100",
+        "Recipe_0294_Fuel_x100": "燃料x100",
+        "Recipe_0295_Fuel_x1000": "燃料x1000"
+      },
       "type": {
         "Type_0001_Activatable_decoration": "可激活装饰",
         "Type_0002_Ammunition": "弹药",

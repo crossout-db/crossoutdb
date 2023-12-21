@@ -79,6 +79,24 @@
             "404": "Sorry, the page you visited does not exist.",
             "resource404": "Are you sure you have created the {{resource}} resource.",
             "backHome": "Back Home"
+        },
+        "item": {
+            "recipe": {
+                "title": "Recipe",
+                "customPrice": "Custom Price",
+                "craftCost": "Craft Cost",
+                "buyPrice": "Buy Price",
+                "sellPrice": "Sell Price",
+                "purchase": "Purchase",
+                "for": "for",
+                "each": "each",
+                "recipeRequires": "Recipe requires",
+                "recipeMakes": "recipe makes",
+                "craft": "Craft",
+                "cart": "Cart",
+                "recipeQty": "recipe quantity",
+                "totalCost": "Total cost:"
+            }
         }
     },
     "actions": {
@@ -102,7 +120,9 @@
         "undo": "Undo",
         "import": "Import",
         "clone": "Clone",
-        "notAccessTitle": "You don't have permission to access"
+        "notAccessTitle": "You don't have permission to access",
+        "expandAll": "Expand all",
+        "collapseAll": "Collapse all"
     },
     "warnWhenUnsavedChanges": "Are you sure you want to leave? You have unsaved changes.",
     "notifications": {
@@ -258,6 +278,27 @@
         "translations": "Translations"
     },
     "db": {
+        "recipe": {
+            "Recipe_Primary": "Primary",
+            "Recipe_0278_Coupons_x10": "Coupons x10",
+            "Recipe_0279_Coupons_x100": "Coupons x100",
+            "Recipe_0280_Scrap_x100": "Scrap x100",
+            "Recipe_0281_Scrap_x1000": "Scrap x1000",
+            "Recipe_0282_Copper_x100": "Copper x100",
+            "Recipe_0283_Copper_x1000": "Copper x1000",
+            "Recipe_0284_Wires_x100": "Wires x100",
+            "Recipe_0285_Wires_x1000": "Wires x1000",
+            "Recipe_0286_Plastic_x100": "Plastic x100",
+            "Recipe_0287_Plastic_x1000": "Plastic x1000",
+            "Recipe_0288_Batteries_x10": "Batteries x10",
+            "Recipe_0289_Batteries_x100": "Batteries x100",
+            "Recipe_0290_Electronics_x10": "Electronics x10",
+            "Recipe_0291_Electronics_x100": "Electronics x100",
+            "Recipe_0292_Uranium_ore_x10": "Uranium ore x10",
+            "Recipe_0293_Uranium_ore_x100": "Uranium ore x100",
+            "Recipe_0294_Fuel_x100": "Fuel x100",
+            "Recipe_0295_Fuel_x1000": "Fuel x1000"
+        },
         "type": {
             "Type_0001_Activatable_decoration": "Activatable decoration",
             "Type_0002_Ammunition": "Ammunition",
