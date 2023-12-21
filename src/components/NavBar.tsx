@@ -51,7 +51,7 @@ const NavBar: React.FC = ({}) => {
 
   return (
     <nav className="bg-neutral-800 drop-shadow">
-      <div className="container mx-auto flex flex-wrap items-center justify-between p-4">
+      <div className="container mx-auto flex flex-wrap items-center justify-between p-4 space-x-2">
         <a
           href={"/"}
           className="item-center mr-6 flex flex-shrink-0 text-white"
@@ -87,50 +87,52 @@ const NavBar: React.FC = ({}) => {
           }
         />
 
-        <div className="flex flex-row space-x-2">
-          <div>
-            {currentUser ? (
-              <div className="relative px-3 py-2">
-                <label
-                  tabIndex={0}
-                  className="avatar btn btn-circle btn-ghost"
-                  onClick={() => setUserControlsActive(!userControlsActive)}
-                >
-                  {currentUser && <Avatar user={currentUser} />}
-                </label>
-                {userControlsActive && (
-                  <div
-                    onMouseLeave={() => setUserControlsActive(false)}
-                    className="absolute right-0 my-2 flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
+        <div
+          className="flex flex-row space-x-2 px-2"
+          onMouseLeave={() => setUserControlsActive(false)}
+        >
+          {currentUser ? (
+            <div className="relative flex flex-row px-3 py-2">
+              <text className="font-semibold text-white">
+                {currentUser.name}
+              </text>
+            </div>
+          ) : (
+            <button
+              className="flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
+              onClick={() => void signIn()}
+            >
+              {t("pages.navbar.user.signIn")}
+            </button>
+          )}
+          <label
+            tabIndex={0}
+            className="avatar btn btn-circle btn-ghost"
+            onClick={() => setUserControlsActive(!userControlsActive)}
+          >
+            <Avatar user={currentUser} />
+          </label>
+          {userControlsActive && (
+            <div
+              onMouseLeave={() => setUserControlsActive(false)}
+              className="absolute right-0 my-2 flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
+            >
+              <ul>
+                {userLinks.map((entry) => (
+                  <li
+                    key={entry.name}
+                    className="whitespace-nowrap hover:text-white"
                   >
-                    <ul>
-                      {userLinks.map((entry) => (
-                        <li
-                          key={entry.name}
-                          className="whitespace-nowrap hover:text-white"
-                        >
-                          {entry.href ? (
-                            <Link href={entry.href}>{entry.name}</Link>
-                          ) : (
-                            <button onClick={entry.onClick}>
-                              {entry.name}
-                            </button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                className="flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
-                onClick={() => void signIn()}
-              >
-                {t("pages.navbar.user.signIn")}
-              </button>
-            )}
-          </div>
+                    {entry.href ? (
+                      <Link href={entry.href}>{entry.name}</Link>
+                    ) : (
+                      <button onClick={entry.onClick}>{entry.name}</button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button
             onClick={() => setMenuActive(!menuActive)}
             className={`${

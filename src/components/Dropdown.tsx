@@ -35,7 +35,7 @@ const Dropdown = ({ options, selectedKey, onChange }: DropdownProps) => {
             width={20}
             height={20}
             alt=""
-            className="mr-3 inline-block h-5 w-5"
+            className="mr-3 inline-block"
           />
         )}
         {option.label}
@@ -48,7 +48,7 @@ const Dropdown = ({ options, selectedKey, onChange }: DropdownProps) => {
       <div>
         <button
           type="button"
-          className="border-xoPrimary text-xoPrimary hover:border-white flex items-center px-2 py-1 border bg-secondary group"
+          className="border-xoPrimary text-xoPrimary hover:border-white flex items-center px-3 py-2 border bg-secondary group"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <span>
