@@ -12,7 +12,7 @@ import { Menu } from "react-feather";
 import Avatar from "@components/Avatar";
 import xodblogo from "public/images/xodblogo150.png";
 import { useCurrentUser } from "~/lib/context";
-
+import Dropdown from "./Dropdown";
 
 const NavBar: React.FC = ({}) => {
   const [menuActive, setMenuActive] = useState(false);
@@ -20,6 +20,7 @@ const NavBar: React.FC = ({}) => {
   const pathname = usePathname();
   const currentUser = useCurrentUser();
   const router = useRouter();
+  const locales = router.locales ?? [];
   const { t, i18n } = useTranslation();
 
   const links = [
@@ -45,8 +46,8 @@ const NavBar: React.FC = ({}) => {
     },
   ];
 
-//   if (currentUser?.role === "ADMIN")
-//     userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
+  //   if (currentUser?.role === "ADMIN")
+  //     userLinks.splice(-1, 0, { name: t("pages.navbar.user.adminPage"), href: "/admin" });
 
   return (
     <nav className="bg-neutral-800 drop-shadow">
@@ -72,14 +73,20 @@ const NavBar: React.FC = ({}) => {
             </div>
           ))}
         </div>
-        <div className="hidden w-full flex-grow lg:flex lg:w-auto lg:items-center">
-            <button className="border-xoPrimary text-xoPrimary flex items-center border bg-black px-3 py-2 hover:border-white"
-            onClick={() =>
-                void router.push(router.pathname, router.asPath, {
-                  locale: i18n.language === "en" ? "ru" : "en",
-                })
-              }>{t("pages.navbar.language")}</button>
-        </div>
+        <Dropdown
+          options={locales.map((lang) => ({
+            label: t(`language.${lang}`) ?? lang,
+            value: lang,
+            icon: "/images/flags/" + lang + ".svg",
+          }))}
+          selectedKey={i18n.language}
+          onChange={(option) =>
+            router.push(router.pathname, router.asPath, {
+              locale: option.value ?? "en",
+            })
+          }
+        />
+
         <div className="flex flex-row space-x-2">
           <div>
             {currentUser ? (
@@ -94,11 +101,14 @@ const NavBar: React.FC = ({}) => {
                 {userControlsActive && (
                   <div
                     onMouseLeave={() => setUserControlsActive(false)}
-                    className="border-xoPrimary text-xoPrimary absolute right-0 my-2 flex items-center border bg-black px-3 py-2 hover:border-white"
+                    className="absolute right-0 my-2 flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
                   >
                     <ul>
                       {userLinks.map((entry) => (
-                        <li key={entry.name} className="whitespace-nowrap hover:text-white">
+                        <li
+                          key={entry.name}
+                          className="whitespace-nowrap hover:text-white"
+                        >
                           {entry.href ? (
                             <Link href={entry.href}>{entry.name}</Link>
                           ) : (
@@ -114,7 +124,7 @@ const NavBar: React.FC = ({}) => {
               </div>
             ) : (
               <button
-                className="border-xoPrimary text-xoPrimary flex items-center border bg-black px-3 py-2 hover:border-white"
+                className="flex items-center border border-xoPrimary bg-black px-3 py-2 text-xoPrimary hover:border-white"
                 onClick={() => void signIn()}
               >
                 {t("pages.navbar.user.signIn")}

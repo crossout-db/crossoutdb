@@ -150,6 +150,12 @@
     "table": {
         "actions": "Actions"
     },
+    "language": {
+        "en": "English",
+        "de": "Deutsch",
+        "ru": "Русский",
+        "zh": "中文"
+    },
     "fields": {
         "id": "ID",
         "name": "Name",

@@ -150,6 +150,12 @@
     "table": {
       "actions": "行动"
     },
+    "language": {
+      "en": "English",
+      "de": "Deutsch",
+      "ru": "Русский",
+      "zh": "中文"
+    },
     "fields": {
       "id": "ID",
       "name": "姓名",
@@ -234,7 +240,9 @@
       "sellOrders": "卖单",
       "buyPriceMax": "最高购买价格",
       "buyOrders": "买单",
+      "craftProfit": "工艺利润",
       "profit": "利润",
+      "craftRoi": "工艺投资回报率",
       "roi": "投资回报率",
       "badge": "徽章",
       "badges": "徽章",
@@ -371,7 +379,7 @@
         "Type_0118_Workpiece_Radar": "工件：雷达",
         "Type_0119_Workpiece_Recharge_booster": "工件：充电增压器",
         "Type_0120_Workpiece_Rocket_launcher": "工件：火箭发射器",
-        "Type_0121_Workpiece_Rolling-based_movement_part": "工件：滚动运动零件",
+        "Type_0121_Workpiece_Rolling-based_movement_part": "工件：滚动运动部件",
         "Type_0122_Workpiece_Shotgun": "工件：霰弹枪",
         "Type_0123_Workpiece_Special_module": "工件：特殊模块",
         "Type_0124_Workpiece_Uncategorized_weapon": "工件：未分类武器"
