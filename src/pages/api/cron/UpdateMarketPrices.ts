@@ -1,18 +1,18 @@
+import { type Prisma } from "@prisma/client";
+import { verifySignature } from "@upstash/qstash/dist/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { env } from "~/env.mjs";
-import { db } from "~/server/db";
-import { Market, Prisma } from "@prisma/client";
 import {
   CalcCraftingCosts,
-  ICalcCraftingCostsError,
-  IItemCrafting,
-  IRecipeCrafting,
+  type ICalcCraftingCostsError,
+  type IItemCrafting,
+  type IRecipeCrafting,
 } from "~/lib/CalcCraftingCost";
+import { db } from "~/server/db";
+
 import { FetchCrossoutDBMarketPrices } from "./FetchCrossoutDBMarketPrices";
 
-export const config = {
-  runtime: "edge",
-};
 
 interface IUpdateMarketPrices {
   debug?: {
@@ -31,17 +31,17 @@ interface IUpdateMarketPricesError {
   message: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const authHeader = req.headers.authorization;
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    console.error("Failed authorization");
-    return res
-      .status(401)
-      .json({ success: false, error: "Failed authorization" });
-  }
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  //   const authHeader = req.headers.authorization;
+  //   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  //     console.error("Failed authorization");
+  //     return res
+  //       .status(401)
+  //       .json({ success: false, error: "Failed authorization" });
+  //   }
+
+  await new Promise((r) => setTimeout(r, 1000));
+
   try {
     const data = await UpdateMarketPrices();
 
@@ -150,3 +150,11 @@ async function UpdateItemCraftingCosts(
     });
   }
 }
+
+export default verifySignature(handler);
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
