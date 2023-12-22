@@ -41,6 +41,9 @@ export async function CalcCraftingCosts() {
   });
 
   const recipes = await db.recipe.findMany({
+    where: {
+      active: true,
+    },
     include: {
       item: true,
       ingredients: {

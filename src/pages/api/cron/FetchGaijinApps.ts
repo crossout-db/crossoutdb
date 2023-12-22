@@ -46,7 +46,7 @@ export async function FetchGaijinApps(appId: string, packId?: number): Promise<{
   if (typeof $ === "function" && $ !== null) {
     const id = $("div.js-cart__cart-item").attr("data-cart-item-id");
     if (id !== appId) {
-      console.error(`Scraped ID does not match query ID: ${appId}`);
+      console.error(`Scraped ID [ ${id} ] does not match request ID [ ${appId} ]`);
       const error: IFetchAppError = {
         appId: appId,
         data: `Scraped ID does not match query ID: ${appId}`,
