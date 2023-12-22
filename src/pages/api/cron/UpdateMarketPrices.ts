@@ -10,6 +10,10 @@ import {
 } from "~/lib/CalcCraftingCost";
 import { FetchCrossoutDBMarketPrices } from "./FetchCrossoutDBMarketPrices";
 
+export const config = {
+  runtime: "edge",
+};
+
 interface IUpdateMarketPrices {
   debug?: {
     batchMarketPrices: Prisma.MarketCreateManyInput[];

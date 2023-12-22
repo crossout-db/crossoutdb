@@ -4,6 +4,10 @@ import { type Prisma } from "@prisma/client";
 import { FetchSteamApps } from "./FetchSteamApps";
 import { FetchGaijinApps } from "./FetchGaijinApps";
 
+export const config = {
+  runtime: "edge",
+};
+
 export interface IFetchAppError {
   appId: string;
   data?: string;
@@ -21,7 +25,6 @@ export default async function handler(
       .json({ success: false, error: "Failed authorization" });
   }
   try {
-
     const data = await UpdatePackPrices();
 
     return res.status(200).json({
