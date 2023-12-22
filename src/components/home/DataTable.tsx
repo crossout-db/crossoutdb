@@ -51,13 +51,13 @@ const DataTable = ({
   const windowSize = useWindowSize();
   useEffect(() => {
     let pageSize = 6;
-    if (windowSize.height && windowSize.height > 810) {
-        pageSize = Math.floor((windowSize.height - 370) / 72);
+    if (windowSize.height && windowSize.height > 840) {
+      pageSize = Math.floor((windowSize.height - 400) / 72);
     }
     setPagination({
-        pageIndex: 0,
-        pageSize: pageSize,
-      });
+      pageIndex: 0,
+      pageSize: pageSize,
+    });
   }, [windowSize.height]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -133,9 +133,7 @@ const DataTable = ({
     <>
       <div className="space-x-3">
         <div className="inline-flex flex-col space-y-0.5">
-          <span className="text-white">
-            {t("search")} H: {windowSize.height} R:{pagination.pageSize}
-          </span>
+          <span className="text-white">{t("search")}</span>
           <div className="inline">
             <DebouncedInput value={globalFilter} onChange={setGlobalFilter}>
               <TextField size={20} icon={Search} />
