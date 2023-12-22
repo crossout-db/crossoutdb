@@ -15,7 +15,7 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useTranslation } from "next-i18next";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -48,6 +48,17 @@ const DataTable = ({
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const windowSize = useWindowSize();
+  useEffect(() => {
+    let pageSize = 6;
+    if (windowSize.height && windowSize.height > 810) {
+        pageSize = Math.floor((windowSize.height - 370) / 72);
+    }
+    setPagination({
+        pageIndex: 0,
+        pageSize: pageSize,
+      });
+  }, [windowSize.height]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 6,
@@ -122,7 +133,9 @@ const DataTable = ({
     <>
       <div className="space-x-3">
         <div className="inline-flex flex-col space-y-0.5">
-          <span className="text-white">{t("search")}</span>
+          <span className="text-white">
+            {t("search")} H: {windowSize.height} R:{pagination.pageSize}
+          </span>
           <div className="inline">
             <DebouncedInput value={globalFilter} onChange={setGlobalFilter}>
               <TextField size={20} icon={Search} />
@@ -241,3 +254,39 @@ const DataTable = ({
 };
 
 export default DataTable;
+
+function useWindowSize() {
+  type WindowDimensions = {
+    width: number | undefined;
+    height: number | undefined;
+  };
+
+  // Initialize state with undefined width/height so server and client renders match
+  // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
+  const [windowSize, setWindowSize] = useState<WindowDimensions>({
+    width: undefined,
+    height: undefined,
+  });
+
+  useEffect(() => {
+    // only execute all the code below in client side
+    // Handler to call on window resize
+    function handleResize() {
+      // Set window width/height to state
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.outerHeight,
+      });
+    }
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Call handler right away so state gets updated with initial window size
+    handleResize();
+
+    // Remove event listener on cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Empty array ensures that effect is only run on mount
+  return windowSize;
+}
