@@ -58,7 +58,9 @@ interface RecipeCardProps {
   data: ItemFindUniqueOutput;
 }
 
-export const resourceIds = [2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877];
+export const resourceIds = [
+  2869, 2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877, 3151,
+];
 const mapRecipesRecursive = (
   lang: string,
   item: ItemFindUniqueOutput,
@@ -71,23 +73,28 @@ const mapRecipesRecursive = (
   if (!item) return [];
 
   let result: RecipeRecord[] = [];
-  let recipeIdx = 0;
-  if (item.recipes.length > 1) {
-    if (
-      (item.recipes[0]?.craftCost ?? 0) > (item.recipes[1]?.craftCost ?? 0) &&
-      item.recipes[1]?.craftCost !== 0
-    ) {
-      recipeIdx = 1;
-    }
+  let selectedRecipe = item.recipes.find((r) => r.name === "Recipe_Workbench");
+  if (!selectedRecipe) {
+    selectedRecipe = item.recipes[0];
   }
+  //   let recipeIdx = 0;
+  //   if (item.recipes.length > 1) {
+  //     if (
+  //       (item.recipes[0]?.craftCost ?? 0) > (item.recipes[1]?.craftCost ?? 0) &&
+  //       item.recipes[1]?.craftCost !== 0
+  //     ) {
+  //       recipeIdx = 1;
+  //     }
+  //   }
   const recipePath = createRecipePath(parentPath, item.id);
-  const recipeQty = item.recipes[recipeIdx]?.quantity ?? 1;
-  const selectedRecipeId = item.recipes[recipeIdx]?.id;
+  const recipeQty = selectedRecipe?.quantity ?? 1;
+  const selectedRecipeId = selectedRecipe?.id;
   const craftCost =
-    (item.recipes[recipeIdx]?.craftCost ?? 0) /
-    (item.recipes[recipeIdx]?.quantity ?? 1);
-  const buyPriceMax = item.buyPriceMax ?? 0;
-  const sellPriceMin = item.sellPriceMin ?? 0;
+    (selectedRecipe?.craftCost ?? 0) / (selectedRecipe?.quantity ?? 1);
+  const buyPriceMax =
+    item.buyPriceMax !== null ? item.buyPriceMax / item.quantity : 0;
+  const sellPriceMin =
+    item.sellPriceMin !== null ? item.sellPriceMin / item.quantity : 0;
   const price = minGrZero([sellPriceMin, craftCost]);
   const craftCostSelected =
     price === craftCost && craftCost !== 0 && !resourceIds.includes(item.id)
@@ -225,7 +232,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ data }) => {
         </div>
         <div></div>
         <div className="flex flex-row justify-end space-x-2 p-2">
-        <span className="w-28 px-2 text-center">
+          <span className="w-28 px-2 text-center">
             {t("pages.item.recipe.customPrice")}
           </span>
           <span className="w-28 px-2 text-center">

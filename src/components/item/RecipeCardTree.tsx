@@ -8,12 +8,13 @@ import Price from "@components/Price";
 import PrimaryButton from "@components/PrimaryButton";
 import Select from "@components/Select";
 import { useIsMediumDevice } from "~/lib/mediaQueryHooks";
+import { minGrZero } from "~/lib/minGrZero";
 import { calculateFloatPrice } from "~/lib/priceCalc";
 import { createRecipePath } from "~/lib/recipePath";
 import { type ItemFindUniqueOutput } from "~/pages/item/[id]";
 
 import { RecipeContext, type RecipeRecord } from "./RecipeCard";
-import { minGrZero } from "~/lib/minGrZero";
+
 
 const mapRecipes = (
   item: ItemFindUniqueOutput | undefined,
@@ -26,7 +27,8 @@ const mapRecipes = (
   const recipeIdx = item.recipes.findIndex(
     (recipe) => recipe.id === recipeState.selectedRecipeId,
   );
-  return item.recipes[recipeIdx === -1 ? 0 : recipeIdx]?.ingredients.map(
+  const selectedRecipe = item.recipes[recipeIdx === -1 ? 0 : recipeIdx];
+  return selectedRecipe?.ingredients.map(
     (ingredient) => (
       <RecipeCardTree
         key={ingredient.id}
@@ -61,6 +63,11 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
     calculateFloatPrice(recipeState?.price ?? 0).toFixed(2),
   );
   const isMediumDevice = useIsMediumDevice();
+
+  const recipeIdx = item.recipes.findIndex(
+    (recipe) => recipe.id === recipeState?.selectedRecipeId,
+  );
+  const selectedRecipe = item.recipes[recipeIdx === -1 ? 0 : recipeIdx];
 
   if (!item) return <></>;
 
@@ -181,9 +188,12 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
             rarityId={item.rarityId}
             size="small"
           />
-          {hasMultipleRecipes && (
-            <div className="flex w-full flex-row justify-end">
+          <div className="flex w-full flex-row justify-end">
+            <span className="text-lg text-red-600">{(!hasMultipleRecipes && selectedRecipe?.name === "Recipe_Workpiece") &&
+              `[ ${t("db.recipe.Recipe_Workpiece")} ]`}</span>
+            {hasMultipleRecipes && (
               <Select
+                textColor={selectedRecipe?.name === "Recipe_Workpiece" ? "red-600" : "xoPrimary"}
                 entries={item.recipes.map((recipe) => ({
                   key: recipe.id.toString(),
                   label: t("db.recipe." + recipe.name),
@@ -198,8 +208,8 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
                 }
                 defaultEntryKey={recipeState?.selectedRecipeId?.toString()}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div
           className={`flex flex-row items-center justify-start space-x-2 ${sharedStyleClasses}`}
@@ -209,12 +219,22 @@ const RecipeCardTree: React.FC<RecipeCardTreeProps> = ({
             <Alert message={"Item is not available\n on the market"} />
           )}
           {hasRecipe && expanded ? (
-            <span>{`${t("pages.item.recipe.recipeRequires")} [ ${recipeState?.ingredientQty} ], ${t("pages.item.recipe.recipeMakes")} [ ${recipeState?.recipeQty} ], ${t("pages.item.recipe.craft")} [ ${
+            <span>{`${t(
+              "pages.item.recipe.recipeRequires",
+            )} [ ${recipeState?.ingredientQty} ], ${t(
+              "pages.item.recipe.recipeMakes",
+            )} [ ${recipeState?.recipeQty} ], ${t(
+              "pages.item.recipe.craft",
+            )} [ ${
               recipeState?.ingredientQty / recipeState?.recipeQty
             } ] `}</span>
           ) : (
             <div className="flex flex-row items-center space-x-1">
-              <span>{`${t("pages.item.recipe.purchase")} [ ${recipeState?.ingredientQty} ] ${t("pages.item.recipe.for")}`}</span>
+              <span>{`${t(
+                "pages.item.recipe.purchase",
+              )} [ ${recipeState?.ingredientQty} ] ${t(
+                "pages.item.recipe.for",
+              )}`}</span>
               <Price value={recipeState?.price ?? 0} />
               <span>{t("pages.item.recipe.each")}</span>
             </div>

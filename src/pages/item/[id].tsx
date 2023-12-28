@@ -178,7 +178,7 @@ export default function ItemPage() {
         {data.itemSynergies.length > 0 && <SynergyCard data={data} />}
       </div>
       <div className="flex flex-col text-white">
-        <RecipeCard data={data} />
+        {data.recipes.length > 0 && <RecipeCard data={data} />}
       </div>
     </div>
   );

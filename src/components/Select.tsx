@@ -7,11 +7,13 @@ interface SelectProps {
     entries: SelectEntry[];
     onChange: (entry: SelectEntry) => void;
     defaultEntryKey?: string;
+    textColor?: string;
 };
 
-const Select = ({ entries, onChange, defaultEntryKey }: SelectProps) => {
+const Select = ({ entries, onChange, defaultEntryKey, textColor }: SelectProps) => {
     const [active, setActive] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState(entries.find(x => x.key === defaultEntryKey) ?? entries[0]);
+    const textColorClass = textColor ? `text-${textColor}` : "text-xoPrimary";
 
     const onClick = (entry: SelectEntry) => {
         if (entry.key !== selectedEntry?.key)
@@ -21,7 +23,7 @@ const Select = ({ entries, onChange, defaultEntryKey }: SelectProps) => {
     }
 
     return <div>
-        <button className={`border-xoPrimary text-xoPrimary hover:border-white flex items-center px-2 py-1 border bg-secondary group`} onClick={() => setActive(!active)}><ChevronDown className="group-hover:text-white" />{selectedEntry?.label}</button>
+        <button className={`border-xoPrimary hover:border-white flex items-center px-2 py-1 border bg-secondary group ${textColorClass}`} onClick={() => setActive(!active)}><ChevronDown className="group-hover:text-white" />{selectedEntry?.label}</button>
         {active && <div className="absolute z-10 my-2 border-xoPrimary text-xoPrimary hover:border-white flex items-center px-3 py-2 border bg-black cursor-pointer" onMouseLeave={() => setActive(false)}>
             <ul>
                 {entries.map(entry => <li key={entry.key} className="hover:text-white whitespace-nowrap" onClick={() => onClick(entry)}>

@@ -1,3 +1,4 @@
+import { resourceIds } from "~/components/item/RecipeCard";
 import { db } from "~/server/db";
 
 export interface IItemCrafting {
@@ -95,7 +96,7 @@ export async function CalcCraftingCosts() {
             message: `${ingredientMessage}: could not find an itemPrice`,
           });
         }
-        if (sellPriceMin == 0 && item.saleable) {
+        if (sellPriceMin == 0) {
           console.warn(
             `${recipeMessage} - ${ingredientMessage}: sellPriceMin = 0`,
           );
@@ -104,18 +105,36 @@ export async function CalcCraftingCosts() {
             message: `${ingredientMessage}: sellPriceMin = 0`,
           });
         }
+        if (
+          itemPrice?.timestamp &&
+          itemPrice?.timestamp < new Date(Date.now() - 24 * 60 * 60 * 1000)
+        ) {
+          console.warn(
+            `${recipeMessage} - ${ingredientMessage}: time stamp older than 24 hours ${itemPrice?.timestamp.toISOString()}`,
+          );
+          errors.push({
+            recipeId: recipe.id,
+            message: `${ingredientMessage}: time stamp older than 24 hours ${itemPrice?.timestamp.toISOString()}`,
+          });
+        }
       }
       const itemCraftCost =
         itemCraftCosts.find((i) => i.itemId === ingredient.itemId)?.craftCost ??
         0;
       if (!itemCraftCost && item.categoryId !== 8) {
-        console.warn(
-          `${recipeMessage} - ${ingredientMessage}: could not find an itemCraftCost`,
+        const hasWorkbench = recipes.find(
+          (r) =>
+            r.itemId === ingredient.itemId && r.name === "Recipe_Workbench",
         );
-        errors.push({
-          recipeId: recipe.id,
-          message: `${ingredientMessage}: could not find an itemCraftCost`,
-        });
+        if (hasWorkbench) {
+          console.warn(
+            `${recipeMessage} - ${ingredientMessage}: could not find an itemCraftCost`,
+          );
+          errors.push({
+            recipeId: recipe.id,
+            message: `${ingredientMessage}: could not find an itemCraftCost`,
+          });
+        }
       }
 
       recipeItems.push({
@@ -131,7 +150,7 @@ export async function CalcCraftingCosts() {
         timestamp: itemPrice?.timestamp,
       });
 
-      let pricePerItem = Math.round(sellPriceMin / item.quantity);
+      let pricePerItem = sellPriceMin / item.quantity;
       if (
         itemCraftCost > 0 &&
         (itemCraftCost < sellPriceMin || sellPriceMin == 0)
@@ -155,12 +174,16 @@ export async function CalcCraftingCosts() {
 
     recipeCraftCosts.push(recipeRecord);
 
-    const recipeCostPerItem = Math.round(
-      recipeRecord.craftCost / recipe.quantity,
-    );
-    if (recipeCostPerItem == 0) {
-      console.warn(`${recipeMessage}: recipeCostPerItem == 0`);
-      errors.push({ recipeId: recipe.id, message: `recipeCostPerItem == 0` });
+    let workbenchCostPerItem = 0;
+    if (
+      recipe.name === "Recipe_Workbench" ||
+      resourceIds.includes(recipe.itemId)
+    ) {
+      workbenchCostPerItem = recipeRecord.craftCost / recipe.quantity;
+      if (workbenchCostPerItem == 0) {
+        console.warn(`${recipeMessage}: recipeCostPerItem == 0`);
+        errors.push({ recipeId: recipe.id, message: `recipeCostPerItem == 0` });
+      }
     }
 
     const itemCraftCost = itemCraftCosts.find(
@@ -168,10 +191,11 @@ export async function CalcCraftingCosts() {
     );
     if (itemCraftCost) {
       if (
-        recipeCostPerItem > 0 &&
-        recipeCostPerItem < itemCraftCost.craftCost
+        workbenchCostPerItem > 0 &&
+        (workbenchCostPerItem < itemCraftCost.craftCost ||
+          itemCraftCost.craftCost == 0)
       ) {
-        itemCraftCost.craftCost = recipeCostPerItem;
+        itemCraftCost.craftCost = workbenchCostPerItem;
       }
     } else {
       const itemPrice = currentMarket?.find(
@@ -194,7 +218,7 @@ export async function CalcCraftingCosts() {
         sellOrders: itemPrice?.sellOrders ?? 0,
         buyPriceMax: itemPrice?.buyPriceMax ?? 0,
         buyOrders: itemPrice?.buyOrders ?? 0,
-        craftCost: recipeCostPerItem,
+        craftCost: Math.round(workbenchCostPerItem),
         timestamp: itemPrice?.timestamp,
       });
     }

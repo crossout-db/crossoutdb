@@ -279,9 +279,10 @@
     },
     "db": {
         "recipe": {
-            "Recipe_Primary": "Primary",
-            "Recipe_0278_Coupons_x10": "Coupons x10",
-            "Recipe_0279_Coupons_x100": "Coupons x100",
+            "Recipe_Workbench": "Workbench",
+            "Recipe_Workpiece": "Workpiece",
+            "Recipe_0278_Coupons_x100": "Coupons x100",
+            "Recipe_0279_Coupons_x1000": "Coupons x1000",
             "Recipe_0280_Scrap_x100": "Scrap x100",
             "Recipe_0281_Scrap_x1000": "Scrap x1000",
             "Recipe_0282_Copper_x100": "Copper x100",
@@ -297,7 +298,9 @@
             "Recipe_0292_Uranium_ore_x10": "Uranium ore x10",
             "Recipe_0293_Uranium_ore_x100": "Uranium ore x100",
             "Recipe_0294_Fuel_x100": "Fuel x100",
-            "Recipe_0295_Fuel_x1000": "Fuel x1000"
+            "Recipe_0295_Fuel_x1000": "Fuel x1000",
+            "Recipe_0306_Engraved_casings_x100": "Engraved casings x100",
+            "Recipe_0307_Engraved_casings_x1000": "Engraved casings x1000"
         },
         "type": {
             "Type_0001_Activatable_decoration": "Activatable decoration",

@@ -81,7 +81,7 @@ export async function UpdateMarketPrices(): Promise<IUpdateMarketPrices> {
       sellOrders: marketPrice.sellOffers,
       buyPriceMax: marketPrice.buyPrice,
       buyOrders: marketPrice.buyOrders,
-      timestamp: new Date(),
+      timestamp: new Date(marketPrice.timestamp),
     });
   }
 
